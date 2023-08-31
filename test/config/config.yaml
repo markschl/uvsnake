@@ -1,0 +1,58 @@
+# (this is actually optional, just shows the defaults)
+defaults:
+  program: vsearch
+  maxaccepts: 1
+  maxrejects: 1
+
+input:
+  sample_file: config/samples.tsv
+
+primers:
+  forward:
+    - ITS3-KYO2:
+        GATGAAGAACGYAGYRAA,
+        GATGAAGRACGCMGCGAA,
+        GATGACGAACGCAGCGAA,
+        GATGAAGAACACAGYGAA,
+        GATGAAGAGCGYAGCRAA,
+        GATGAAGAACGCGGCGAA,
+        TCGATGAAGAMCGTWGC
+  reverse:
+    - ITS4:
+        TCCTCCGCTTATTGATATGC,
+        TCCTCCGCTTATTAATATGC,
+        TCCTCCGCTTAVTGATATGC,
+        TCCTCCACTTATTGATATGC,
+        TCCTCTGCTTATTGATATGC,
+        TCCTGCGCTTATTGATATGC,
+        TCCTCCGCTGAWTAATATGC,
+        TCCTCGCCTTATTGATATGC
+  trim_settings:
+    min_overlap: 15
+    max_error_rate: 0.1
+
+merge:
+  overlap_ident: 75
+  max_diffs: 1000
+
+filter:
+  min_length: 100
+  max_error_rate: 0.002
+
+# (optional, only needed if 'uparse' rule is run)
+uparse:
+  min_size: 2
+
+# (optional, only needed if 'unoise3' rule is run)
+unoise3:
+  min_size: 8
+
+otutab:
+  ident_threshold: 97
+  maxaccepts: 32
+  maxrejects: 32
+
+sintax:
+  db: unite_refs.fasta.gz
+  db_format: qiime
+  confidence: 0.8

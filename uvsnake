@@ -1,0 +1,132 @@
+#!/usr/bin/env python3
+
+import argparse
+import os
+import sys
+import multiprocessing
+
+try:
+    from yaml import safe_load
+except ImportError:
+    print("The 'pyyaml' package is missing. Simplest is to install it "
+          "e.g. with this command: 'pip3 install --user pyyaml'", file=sys.stderr)
+    exit(1)
+
+try:
+    import snakemake
+except ImportError:
+    print("Snakemake not found. Did you forget 'conda activate snakemake'? "
+          "Alternatively, you may install Snakemake system-wide.", file=sys.stderr)
+    exit(1)
+
+
+def main(argv = sys.argv[1:]):
+
+    p = argparse.ArgumentParser(
+        description="USEARCH/VSEARCH-based amplicon pipeline")
+    
+    p.add_argument(
+        "directory",
+        help="""
+        Working directory where the configuration is found ('config'
+        directory) and all output is placed.
+        """)
+    p.add_argument(
+        "target",
+        nargs="*",
+        help="""
+        Targets to build (rules or files).
+        """)
+
+    d = p.add_argument_group("Data storage (common for all datasets)")
+    d.add_argument(
+        "--conda-dir",
+        default=os.path.join("~", "uvsnake", "conda"),
+        help="""
+        Location to store Conda environments and archives
+        """)
+
+    r = p.add_argument_group("job resources")
+    r.add_argument(
+        "-c", "--cores",
+        default="1",
+        help="""
+        Number of CPU cores to use at most, or 'all' to use all available cores.
+        The default is 1 (one core)
+        """)
+    r.add_argument(
+        "-j", "--jobs",
+        default="1",
+        help="""
+        Number of jobs to submit or 'unlimited'. This is only relevant in cluster/cloud mode.
+        The default is 1, so make sure to change this in order to run jobs
+        simultanesously on multiple nodes.
+        """)
+    r.add_argument(
+        "--local-cores", type=int,
+        default=1,
+        help="""
+        Number of cores to use for very short computations on the host machine.
+        This is not relevant on a normal PC.
+        """)
+    
+    dev = p.add_argument_group("Other")
+    dev.add_argument(
+        "--dev", action="store_true",
+        help="""
+        Developer mode: equivalent to --rerun-triggers mtime,params,input,software-env
+        (excluding 'code' to make sure not everything is always re-run).
+        Also, --quiet is not supplied, showing all output of snakemake
+        """
+    )
+    dev.add_argument(
+        "-v", "--verbose", action="store_true",
+        help="Show all snakemake output (--quiet flag omitted)"
+    )
+
+    args, other_args = p.parse_known_args(argv)
+    
+    # determine resources
+    n_cores = multiprocessing.cpu_count() if args.cores == 'all' else int(args.cores)
+    if args.jobs == 'unlimited':
+        print("Warning: setting -j/--jobs to 'unlimited' can cause many"
+              "small jobs to run. Setting to 20 jobs. This can be changed with -j <number>.",
+               file=sys.stderr)
+        n_jobs = 20
+    else:
+        n_jobs = int(args.jobs)
+
+    # For now, we just use the maximum number of samples from any
+    # workflow to determine the group sizes, since we don't know
+    # which workflows actually have sample groups
+    with open(os.path.join(args.directory, "config", "config.yaml")) as f:
+        cfg = safe_load(f)
+        with open(os.path.join(args.directory, cfg["input"]["sample_file"])) as f:
+            nsamples = max(0, sum(1 for line in f if line.strip(" \r\n")) - 1)
+    # Sample batch sizes are chosen in a way that the number of batches is
+    # 1.5x the number of jobs (but batch size is at least 10 samples).
+    sample_group_size = max(10, round(nsamples / n_jobs * 1.5))
+
+    # basic command
+    cmd = [
+        "-d", args.directory,
+        "-c", str(n_cores), "-j", str(n_jobs),
+        "--local-cores", str(args.local_cores),
+        "--group-components", f"sample={sample_group_size}",
+        "--use-conda", "--conda-prefix", args.conda_dir,
+        "--rerun-incomplete"
+    ]
+    if args.dev:
+        cmd += ["--rerun-triggers", "mtime", "params", "input", "software-env"]
+    elif not args.verbose:
+        cmd += ["--quiet", "rules"]
+
+    cmd = args.target + cmd + other_args
+
+    # Finally, we can run Snakemake
+    print("Running: snakemake " + " ".join(cmd), file=sys.stderr)
+    snakemake.main(cmd)
+
+
+if __name__ == '__main__':
+    main()

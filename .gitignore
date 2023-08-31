@@ -1,0 +1,13 @@
+workdir/
+logs/
+*~
+_*/
+.snakemake*
+multiqc*
+unite_*.fasta.gz
+.tests/
+*.pyc
+*.swp
+.idea
+.Rhistory
+.DS_Store

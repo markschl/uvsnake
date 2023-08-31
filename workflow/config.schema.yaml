@@ -1,0 +1,209 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: https://raw.githubusercontent.com/markschl/uvsnake/main/workflow/config.schema.yaml
+description: USEARCH/VSEARCH-based amplicon pipeline configuration
+properties:
+
+  defaults:
+    type: object
+    properties:
+      program: { $ref: "#/$defs/program" }
+      maxaccepts: { $ref: "#/$defs/maxaccepts" }
+      maxrejects: { $ref: "#/$defs/maxrejects" }
+    default:
+      program: vsearch
+      maxaccepts: 1
+      maxrejects: 1
+
+  usearch_binary:
+    type: string
+    default: usearch
+    description:
+        USEARCH binary name/path (download from https://drive5.com/usearch).
+        The default is 'usearch', assuming that the program is accessible
+        in $PATH. Alternatively, an absolute or relative path
+        (relative to analysis directory containing 'config') can be
+        specified.
+
+  input:
+    type: object
+    properties:
+      sample_file:
+        type: string
+        description: >
+          Path to a sample file with one forward 
+    required: [sample_file]
+    additionalProperties: false
+
+  primers:
+    type: object
+    properties:
+      trim_settings:
+        type: object
+        properties:
+          min_overlap:
+            type: integer
+            minimum: 5
+          max_error_rate:
+            type: number
+            exclusiveMinimum: 0
+            maximum: 1
+        required: [min_overlap, max_error_rate]
+        additionalProperties: false
+    if:
+      required: [trim_settings]
+    else:
+      patternProperties:
+        ^(\w+)$:
+          type: object
+          properties:
+            forward:
+              type: array
+              items:
+                type: object
+                patternProperties:
+                  ^(\w+)$:
+                    type: string
+              minItems: 1
+            reverse:
+              type: array
+              items:
+                type: object
+                patternProperties:
+                  ^(\w+)$:
+                    type: string
+              minItems: 1
+            combinations:
+              oneOf:
+                - { type: string, enum: [all] }
+                - 
+                  type: array
+                  items: { type: string }
+                  minItems: 1
+              default: all
+          required: [forward, reverse]
+          additionalProperties: false
+      minProperties: 1
+      additionalProperties: false
+
+  merge:
+    type: object
+    properties:
+      overlap_ident:
+        type: integer
+        minimum: 0
+        maximum: 100
+      max_diffs:
+        type: integer
+        minimum: 0
+      program: { $ref: "#/$defs/program" }
+    required: [overlap_ident, max_diffs]
+    additionalProperties: false
+  
+  filter:
+    type: object
+    properties:
+      min_length:
+        type: integer
+        minimum: 1
+      max_error_rate:
+        type: number
+        minimum: 0
+        maximum: 1
+    required: [max_error_rate]
+    additionalProperties: false
+  
+  unoise3:
+    type: object
+    properties:
+      min_size:
+        type: integer
+        minimum: 1
+      program: { $ref: "#/$defs/program" }
+      maxaccepts: { $ref: "#/$defs/maxaccepts" }
+      maxrejects: { $ref: "#/$defs/maxrejects" }
+    required: [min_size]
+    additionalProperties: false
+  
+  uparse:
+    type: object
+    properties:
+      min_size:
+        type: integer
+        minimum: 1
+        default: 2
+      program: { $ref: "#/$defs/program" }
+      maxaccepts: { $ref: "#/$defs/maxaccepts" }
+      maxrejects: { $ref: "#/$defs/maxrejects" }
+    required: [min_size]
+    additionalProperties: false
+  
+  otutab:
+    type: object
+    properties:
+      ident_threshold:
+        type: number
+        minimum: 0
+        maximum: 100
+      extra:
+        type: boolean
+        default: false
+      program: { $ref: "#/$defs/program" }
+      maxaccepts: { $ref: "#/$defs/maxaccepts" }
+      maxrejects: { $ref: "#/$defs/maxrejects" }
+    required: [ident_threshold]
+    additionalProperties: false
+
+  # post_cluster:
+  #   type: object
+  #   properties:
+  #     ident_threshold:
+  #       type: number
+  #       minimum: 0
+  #       maximum: 100
+  #     program: { $ref: "#/$defs/program" }
+  #     maxaccepts:
+  #       type: integer
+  #       minimum: 1
+  #       default: 64
+  #     maxrejects:
+  #       type: integer
+  #       minimum: 1
+  #       default: 64
+  #   required: [ident_threshold]
+  #   additionalProperties: false
+
+  sintax:
+    type: object
+    properties:
+      db:
+        type: string
+      db_format:
+        type: string
+      confidence:
+        type: number
+        minimum: 0
+        maximum: 1
+      program: { $ref: "#/$defs/program" }
+      maxaccepts: { $ref: "#/$defs/maxaccepts" }
+      maxrejects: { $ref: "#/$defs/maxrejects" }
+    required: [db, db_format, confidence]
+    additionalProperties: false
+
+# repeatedly used settings
+$defs:
+  program:
+    type: string
+    enum: [vsearch, usearch]
+    default: vsearch
+  maxaccepts:
+    type: integer
+    minimum: 1
+    default: 1
+  maxrejects:
+    type: integer
+    minimum: 1
+    default: 1
+
+additionalProperties: false
+
+required: [input, primers, merge, filter, otutab]

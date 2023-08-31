@@ -1,0 +1,155 @@
+
+defaults:
+  # Program to use by default for read merging, denoising OTU table construction 
+  # and post-clustering.
+  # The output should still be similar between USEARCH and VSEARCH, except for
+  # the read merging, where VSEARCH is more conservative (see comment below)
+  # This default can still be overridden by the individual program settings
+  # (set them to 'usearch' or 'vsearch' instead of 'default')
+  program: vsearch  # {vsearch, usearch}
+  # termination options
+  # https://drive5.com/usearch/manual/termination_options.html
+  # Their values have a strong impact on speed and sensitivity
+  # * setting both to 0 searches the whole database
+  # * setting to values > 1 results in a more precise, but slower search/clustering
+  # These are the default settings by USEARCH and VSEARCH
+  # the unoise3, uparse, post_cluster, otutab and sintax commands all
+  # accept these settings as well, which overrides these defaults
+  # An exception is post_cluster, which has a default of 64 for both already
+  maxaccepts: 1
+  maxrejects: 1
+
+# Default search settings
+
+# Path to USEARCH binary
+# (download here: https://drive5.com/usearch/)
+# By default, we assume that binary is in PATH as 'usearch'
+usearch_binary: usearch
+
+# Sample file, which is a three-column file with the following header:
+# id  R1  R2
+# The R1/R2 sample paths must be absolute, or relative to the 
+# target directory where the results go (not the Snakemake directory).
+# (QIIME2 manifest files are accepted, too)
+input:
+  sample_file: manifest_paired_run1.tsv
+
+# primers/primer combinations
+primers:
+  forward:
+    # this is a list with one or several primers (depending on what you have in the run)
+    - ITS3-KYO2: GGGATGAAGAACGYAGYRAA
+    - fwd-other: GAACGYAGYRAAGGGATGAA
+  reverse:
+    - ITS4:
+        # there may be a mix of different primers, which all start at the
+        # same position in the locus
+        AATCCTCCGCTTATTGATATGC,
+        AATCCTCCGCTGAWTAATATGC
+    - rev-other: AATATGCAATCCGCTGAWTTCC
+  # (optional) primer combinations:
+  # either 'all' (the default, lists all possible combinations),
+  # or a list of combinations (see below)
+  combinations: all
+    ## Instead of 'all', a list of specific desired combinations
+    ## can be supplied. Every combination will obtain its own results directory
+    ## (named "marker__forward...reverse")
+    ## The primer combination format must be: "forward...reverse"
+    # - ITS3-KYO2...ITS4
+    # - fITS7...ITS4
+  # Primer trimming settings
+  trim_settings:
+    min_overlap: 15
+    max_error_rate: 0.25
+
+# paired end merging
+# Note on 'program' setting:
+# VSEARCH is more conservative regarding more reads of potentially
+# bad quality will remain unmerged with the message
+# "alignment score too low, or score drop too high" regardless of the options
+# specified (overlap_ident, max_diffs)
+# https://groups.google.com/g/vsearch-forum/c/ojqZYbEyUw4/m/9RMhPQbXAwAJ
+merge:
+  overlap_ident: 75  # percent
+  # max. nucleotide differences
+  # here, we don't care about this (setting the number very high),
+  # we only rely on overlap identity
+  max_diffs: 1000
+  # (optional) other settings, overriding above defaults
+  # program: usearch
+
+# read filtering before denoising/clustering
+# (done by VSEARCH)
+filter:
+  # minimum amplicon length (shorter may be adapters)
+  min_length: 100
+  # Maximum per-base error rate
+  # (e.g. 0.002 per bp means 0.8 errors per 400 bp)
+  max_error_rate: 0.002
+
+# UPARSE options (https://doi.org/10.1038/nmeth.2604)
+# USEARCH command: https://www.drive5.com/usearch/manual/cmd_cluster_otus.html
+# The clustering threshold is fixed at 97%
+# (uparse target rule, creates 'otus.fasta')
+uparse:
+  # min. OTU size (USEARCH has 2 as default, discarding singletons)
+  min_size: 2
+  # (optional) other settings, overriding above defaults
+  # program: usearch
+  # maxaccepts: 8
+  # maxrejects: 8
+
+# UNOISE3 settings
+# USEARCH command: https://www.drive5.com/usearch/manual/cmd_unoise3.html
+# (unoise3 target rule, creates 'denoised.fasta')
+unoise3:
+  # min. zOTU size (USEARCH has 8 as default)
+  min_size: 8
+  # (optional) other settings, overriding above defaults
+  # program: usearch
+  # maxaccepts: 8
+  # maxrejects: 8
+
+# # Post-clustering of UNOISE3 zOTUs at a fixed threshold
+# # using USEARCH/VSEARCH -cluster_size (sizes are taken from OTU table)
+# # (postcluster target rule, creates 'denoised_cluster.fasta')
+# post_cluster:
+#   # identity threshold (percent)
+#   ident_threshold: 97
+#   # (optional settings)
+#   # program: usearch
+#   # search options (these are actually the defaults!)
+#   # maxaccepts: 64
+#   # maxrejects: 64
+
+# Mapping options for creation of OTU table
+# for USEARCH: https://www.drive5.com/usearch/manual/cmd_otutab.html
+# with VSEARCH, we use the standard -usearch_global
+otutab:
+  # similarity threshold (USEARCH -otutab uses 97% as default)
+  ident_threshold: 97
+  # Creates two additional output files (may be large!):
+  # * BAM file for inspection of mapped reads (VSEARCH only)
+  # * A TSV file (named ..._search.txt.gz) mapping each read to each cluster.
+  # They are placed in workdir/otutab_mapping
+  extra: true
+  # (optional) other settings, overriding above defaults
+  # program: usearch
+  maxaccepts: 64
+  maxrejects: 64
+
+# Taxonomy assignment options
+sintax:
+  # path to database (can be GZIP-compressed)
+  db: unite.fasta.gz
+  # database format: (example has only kingdom and order defined)
+  # * QIIME-style: >id k__Kingdom;p__;o__Order;f__;g__;s__;
+  # * UTAX-style headers: >id;tax=k:Kingdom,o:Order;
+  db_format: qiime  # {qiime, utax}
+  # bootstrap threshold
+  confidence: 0.9
+  # (optional) other settings, overriding above defaults
+  # program: usearch
+  # # (only used by USEARCH:)
+  # maxaccepts: 8
+  # maxrejects: 8
