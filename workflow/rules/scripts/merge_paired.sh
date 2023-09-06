@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-exec &> ${snakemake_log[0]}
+exec &> "${snakemake_log[0]}"
 set -xeuo pipefail
 
 
@@ -20,9 +20,13 @@ if [[ "${snakemake_params[program]}" == "vsearch" ]]; then
     extra="--fastq_maxdiffpct $max_diffpct --fastq_allowmergestagger"
     bin=vsearch
 
-elif [[ "${snakemake_params[program]}" == "usearch" ]]; then
+elif [[ ${snakemake_params[program]} == "usearch" ]]; then
     extra="-fastq_pctid ${snakemake_params[overlap_ident]}"
     bin="${snakemake_params[usearch_bin]}"
+    # Unfortunately, -fastq_mergepairs fails with spaces in paths with usearch v11
+    # Therefore we ensure that the tempdir path is relative and never absolute
+    # (we know that there are no spaces in relative paths)
+    tempdir=$(python3 <<< "import os; print(os.path.relpath('$tempdir'))")
 
 else
   echo "unknown program: ${snakemake_params[program]}"

@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-exec &> ${snakemake_log[0]}
+exec &> "${snakemake_log[0]}"
 set -xeuo pipefail
 
 
-if [[ "${snakemake_params[program]}" == "usearch" ]]; then
+if [[ ${snakemake_params[program]} == "usearch" ]]; then
     zstd -dqf "${snakemake_input[0]}"
     input_uncompressed="${snakemake_input[0]%.zst}"
 
@@ -17,7 +17,7 @@ if [[ "${snakemake_params[program]}" == "usearch" ]]; then
     
     rm "$input_uncompressed"
 
-elif [[ "${snakemake_params[program]}" == "vsearch" ]]; then
+elif [[ ${snakemake_params[program]} == "vsearch" ]]; then
     # following code from https://github.com/torognes/vsearch/pull/283
     # using 'stdbuf' to prevent mixing of the command messages
     zstd -dcqf "${snakemake_input[0]}" \

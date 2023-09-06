@@ -68,4 +68,4 @@ The *taxonomy* rule should not be run together with the *unoise3* and/or *uparse
 
 ## Example
 
-The [test](test/README.md) directory offers more details using an example dataset and shows how this pipeline is validated.
+The [test](test) directory offers more details using an example dataset and shows how this pipeline is validated.

@@ -6,13 +6,18 @@ properties:
   defaults:
     type: object
     properties:
-      program: { $ref: "#/$defs/program" }
-      maxaccepts: { $ref: "#/$defs/maxaccepts" }
-      maxrejects: { $ref: "#/$defs/maxrejects" }
-    default:
-      program: vsearch
-      maxaccepts: 1
-      maxrejects: 1
+      program:
+        type: string
+        enum: [vsearch, usearch]
+        default: vsearch
+      maxaccepts:
+        type: integer
+        minimum: 1
+        default: 1
+      maxrejects:
+        type: integer
+        minimum: 1
+        default: 1
 
   usearch_binary:
     type: string
@@ -95,7 +100,7 @@ properties:
       max_diffs:
         type: integer
         minimum: 0
-      program: { $ref: "#/$defs/program" }
+      program: { $ref: "#/properties/defaults/properties/program" }
     required: [overlap_ident, max_diffs]
     additionalProperties: false
   
@@ -118,9 +123,9 @@ properties:
       min_size:
         type: integer
         minimum: 1
-      program: { $ref: "#/$defs/program" }
-      maxaccepts: { $ref: "#/$defs/maxaccepts" }
-      maxrejects: { $ref: "#/$defs/maxrejects" }
+      program: { $ref: "#/properties/defaults/properties/program" }
+      maxaccepts: { $ref: "#/properties/defaults/properties/maxaccepts" }
+      maxrejects: { $ref: "#/properties/defaults/properties/maxrejects" }
     required: [min_size]
     additionalProperties: false
   
@@ -131,9 +136,9 @@ properties:
         type: integer
         minimum: 1
         default: 2
-      program: { $ref: "#/$defs/program" }
-      maxaccepts: { $ref: "#/$defs/maxaccepts" }
-      maxrejects: { $ref: "#/$defs/maxrejects" }
+      program: { $ref: "#/properties/defaults/properties/program" }
+      maxaccepts: { $ref: "#/properties/defaults/properties/maxaccepts" }
+      maxrejects: { $ref: "#/properties/defaults/properties/maxrejects" }
     required: [min_size]
     additionalProperties: false
   
@@ -147,9 +152,9 @@ properties:
       extra:
         type: boolean
         default: false
-      program: { $ref: "#/$defs/program" }
-      maxaccepts: { $ref: "#/$defs/maxaccepts" }
-      maxrejects: { $ref: "#/$defs/maxrejects" }
+      program: { $ref: "#/properties/defaults/properties/program" }
+      maxaccepts: { $ref: "#/properties/defaults/properties/maxaccepts" }
+      maxrejects: { $ref: "#/properties/defaults/properties/maxrejects" }
     required: [ident_threshold]
     additionalProperties: false
 
@@ -160,7 +165,7 @@ properties:
   #       type: number
   #       minimum: 0
   #       maximum: 100
-  #     program: { $ref: "#/$defs/program" }
+  #     program: { $ref: "#/properties/defaults/properties/program" }
   #     maxaccepts:
   #       type: integer
   #       minimum: 1
@@ -183,26 +188,11 @@ properties:
         type: number
         minimum: 0
         maximum: 1
-      program: { $ref: "#/$defs/program" }
-      maxaccepts: { $ref: "#/$defs/maxaccepts" }
-      maxrejects: { $ref: "#/$defs/maxrejects" }
+      program: { $ref: "#/properties/defaults/properties/program" }
+      maxaccepts: { $ref: "#/properties/defaults/properties/maxaccepts" }
+      maxrejects: { $ref: "#/properties/defaults/properties/maxrejects" }
     required: [db, db_format, confidence]
     additionalProperties: false
-
-# repeatedly used settings
-$defs:
-  program:
-    type: string
-    enum: [vsearch, usearch]
-    default: vsearch
-  maxaccepts:
-    type: integer
-    minimum: 1
-    default: 1
-  maxrejects:
-    type: integer
-    minimum: 1
-    default: 1
 
 additionalProperties: false
 

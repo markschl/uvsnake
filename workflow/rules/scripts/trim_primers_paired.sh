@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-exec &> ${snakemake_log[0]}
+exec &> "${snakemake_log[0]}"
 set -xeuo pipefail
 
 
@@ -11,7 +11,7 @@ sample="${snakemake_wildcards[sample]}"
 # we know that the output files are all in the same directory, therefore
 # we can use the dirname of the first file
 split_files=("${snakemake_output[by_primers]}")
-outdir=$(dirname ${split_files[0]})
+outdir="$(dirname "${split_files[0]}")"
 mkdir -p "$outdir"
 
 # First, recognize forward and reverse primers, which are supplied as 
@@ -53,11 +53,11 @@ zstd -dcq "${snakemake_input[seq]}" \
 # even the ones that don't have any reads.
 shopt -s nullglob
 for comb in ${snakemake_params[primer_comb]}; do
-    if [ -f $outdir/$comb.fastq ]; then
-        zstd --rm -qf $outdir/$comb.fastq
+    if [ -f "$outdir/$comb.fastq" ]; then
+        zstd --rm -qf "$outdir/$comb.fastq"
     else
         echo "No sequences with both forward and reverse primer ($comb) were found in sample '$sample'"
-        echo -n | zstd -cq > $outdir/$comb.fastq.zst
+        echo -n | zstd -cq > "$outdir/$comb.fastq.zst"
     fi
 done
 # compress reads that are too short

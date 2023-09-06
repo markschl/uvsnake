@@ -5,6 +5,7 @@ _*/
 .snakemake*
 multiqc*
 unite_*.fasta.gz
+*.html
 .tests/
 *.pyc
 *.swp

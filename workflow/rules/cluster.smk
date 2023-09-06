@@ -47,8 +47,31 @@ rule collect_derep:
         "envs/vsearch.yaml"
     resources:
         mem_mb=5000,
-    script:
-        "scripts/collect_derep.sh"
+    shell:
+        """
+        exec &> "{log}"
+        set -xeuo pipefail
+
+        # First, combine the filtered and de-replicated sample files,
+        # and de-replicate these sequences again.
+        # This is important, because UNOISE assumes unique sequences
+        # with size annotations.
+        # TODO: the output is sorted by size according to VSEARCH docs.
+        #   -> Make sure that this stays the same when updating to
+        #      future versions.
+        zstd -dcq {input.good:q} | 
+            vsearch -derep_fulllength - -sizein -sizeout -output - |
+            zstd -cq > "{output.good}"
+
+        # Second, combine unfiltered (actually, length filtered after trimming)
+        # and de-replicated sequences into one file. These will be used
+        # for mapping against the denoised sequences to create the OTU table.
+        # It is important *not* to de-replicate them again here,
+        # otherwise part of the sample labels will be lost, leading to 
+        # incorrect results.
+        zstd -dcq {input.all:q} |
+            zstd -cq > "{output.all}"
+        """
 
 
 rule cluster_unoise3:

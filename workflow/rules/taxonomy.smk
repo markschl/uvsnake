@@ -1,11 +1,11 @@
 
 rule import_taxdb:
     params:
-        format=config["sintax"]["db_format"]
+        format=lambda _: config["sintax"]["db_format"]
     input:
-        db=config["sintax"]["db"],
+        db=lambda _: config["sintax"]["db"],
     output:
-        db="workdir/sintax/taxdb.fasta.zst",
+        db="workdir/sintax/taxdb.fasta",
     log:
         "logs/sintax/import_taxdb.log",
     conda:
@@ -18,17 +18,18 @@ rule import_taxdb:
 
 rule assign_taxonomy_sintax:
     params:
-        confidence=config["sintax"]["confidence"],
-        program=with_default("program", "sintax"),
-        usearch_bin=config["usearch_binary"],
-        maxaccepts=with_default("maxaccepts", "sintax"),
-        maxrejects=with_default("maxrejects", "sintax"),
+        confidence=lambda _: config["sintax"]["confidence"],
+        program=lambda _: with_default("program", "sintax"),
+        usearch_bin=lambda _: config["usearch_binary"],
+        # TODO: not sure if USEARCH even uses these settings (VSEARCH doesnt')
+        maxaccepts=lambda _: with_default("maxaccepts", "sintax"),
+        maxrejects=lambda _: with_default("maxrejects", "sintax"),
     input:
         fa="results/{primers}/{what}.fasta",
-        db="workdir/sintax/taxdb.fasta.zst",
+        db="workdir/sintax/taxdb.fasta",
     output:
         sintax="results/{primers}/{what}_sintax.txt.gz",
-        tab="results/{primers}/{what}_sintax_taxtab.txt.gz",
+        taxtab="results/{primers}/{what}_sintax_taxtab.txt.gz",
     log:
         "logs/sintax/{primers}/{what}_sintax.log",
     group:
@@ -39,7 +40,7 @@ rule assign_taxonomy_sintax:
     # VSEARCH works in parallel (although cores seem to be used only ~50%) while
     # USEARCH v11 does not appear to use more than 1 thread
     threads:
-        workflow.cores \
+        lambda _: workflow.cores \
         if with_default("program", "sintax") == "vsearch" \
         else 1
     resources:

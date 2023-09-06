@@ -1,6 +1,6 @@
 
 
-exec &> ${snakemake_log[0]}
+exec &> "${snakemake_log[0]}"
 set -xeuo pipefail
 
 

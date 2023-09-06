@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-exec &> ${snakemake_log[0]}
+exec &> "${snakemake_log[0]}"
 set -xeuo pipefail
 
 
-mkdir -p $(dirname "${snakemake_output[tax_tmp]}")
+mkdir -p "$(dirname "${snakemake_output[tax_tmp]}")"
 
 # write header
 gzip -dc "${snakemake_input[tax]}" | 

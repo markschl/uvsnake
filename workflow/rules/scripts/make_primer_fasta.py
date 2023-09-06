@@ -1,5 +1,4 @@
 from utils import file_logging
-import yaml
 
 
 def _make_fasta(primers, outfile, add_anchor):
@@ -18,8 +17,8 @@ def make_primer_fasta(primers, fwd_out, rev_out, rev_rev_out):
     _make_fasta(primers["reverse_rev"], rev_rev_out, lambda s: s + '$')
 
 
-# with file_logging(snakemake.log[0]):
-make_primer_fasta(snakemake.params.primer_config,
-                    snakemake.output.fwd,
-                    snakemake.output.rev,
-                    snakemake.output.reverse_rev)
+with file_logging(snakemake.log[0]):
+    make_primer_fasta(snakemake.params.primer_config,
+                        snakemake.output.fwd,
+                        snakemake.output.rev,
+                        snakemake.output.reverse_rev)

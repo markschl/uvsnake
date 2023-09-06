@@ -8,7 +8,6 @@ min_version("7.14.0")
 
 ##### configuration #####
 
-
 configfile: "config/config.yaml"
 
 validate(config, "config.schema.yaml")
@@ -18,78 +17,17 @@ validate(config, "config.schema.yaml")
 ##### load rules #####
 
 include: "rules/common.smk"
-include: "rules/qc.smk"
-include: "rules/prepare_paired.smk"
-include: "rules/cluster.smk"
-include: "rules/taxonomy.smk"
+include: "rules/clean.smk"
 
+# Initialize regular pipeline if configuration is present.
+# This allows using this workflow as module
+# (where schema validation can be skipped)
+if "input" in config and "primers" in config:
+    include: "rules/other.smk"
+    include: "rules/qc.smk"
+    include: "rules/prepare_paired.smk"
+    include: "rules/cluster.smk"
+    include: "rules/targets.smk"
 
-#### target rules #####
-
-
-rule config:
-    input:
-        rules.dump_config.output,
-
-
-rule quality:
-    input:
-        rules.multiqc_paired.output,
-
-
-rule unoise3:
-    input:
-        rules.config.output,
-        expand(
-            "results/{primers}/{what}",
-            primers=config["_primer_combinations"],
-            what=["unoise3.fasta", "unoise3_otutab.txt.gz", "unoise3.biom"]
-        ),
-        rules.stats_paired.output,
-
-rule uparse:
-    input:
-        rules.config.output,
-        expand(
-            "results/{primers}/{what}",
-            primers=config["_primer_combinations"],
-            what=["uparse.fasta", "uparse_otutab.txt.gz", "uparse.biom"]
-        ),
-        rules.stats_paired.output,
-
-
-# rule post_cluster:
-#     input:
-#         rules.config.output,
-#         expand(
-#             "results/{primers}/{what}",
-#             primers=config["_primer_combinations"],
-#             what=["unoise3_cluster.fasta", "unoise3_cluster_otutab.txt.gz", "unoise3_cluster.biom"]
-#         ),
-
-# This rule is only run on existing files and will thus do nothing if there 
-# are no clustered/denoised FASTA files.
-rule sintax:
-    input:
-        lambda wildcards: expand_clustered(
-            "results/{primers}/{seqs}_{suffix}",
-            suffix=["sintax.txt.gz", "sintax_taxtab.txt.gz", 
-                    "sintax.biom.gz", "sintax.fasta.gz"],
-            **wildcards
-        ),
-
-
-# commands for cleaning up
-
-
-localrules:
-    clean,
-    clean_all,
-
-rule clean:
-    shell:
-        "rm -Rf workdir logs"
-
-rule clean_all:
-    shell:
-        "rm -Rf results qc workdir logs"
+if "sintax" in config:
+    include: "rules/taxonomy.smk"
