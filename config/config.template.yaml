@@ -47,16 +47,14 @@ primers:
         AATCCTCCGCTTATTGATATGC,
         AATCCTCCGCTGAWTAATATGC
     - rev-other: AATATGCAATCCGCTGAWTTCC
-  # (optional) primer combinations:
-  # either 'all' (the default, lists all possible combinations),
-  # or a list of combinations (see below)
+     # (optional) Primer combinations: either missing, 'all' (has the same effect)
+    # or a list of combinations (see below)
   combinations: all
-    ## Instead of 'all', a list of specific desired combinations
-    ## can be supplied. Every combination will obtain its own results directory
-    ## (named "marker__forward...reverse")
-    ## The primer combination format must be: "forward...reverse"
-    # - ITS3-KYO2...ITS4
-    # - fITS7...ITS4
+      ## Custom list of combinations:
+      ## Every combination will obtain its own results directory
+      ## The primer combination format must be: "forward...reverse"
+      # - ITS3-KYO2...ITS4
+      # - fITS7...ITS4
   # Primer trimming settings
   trim_settings:
     min_overlap: 15
