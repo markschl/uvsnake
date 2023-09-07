@@ -1,5 +1,4 @@
-from snakemake.utils import min_version
-from snakemake.utils import validate
+from snakemake.utils import min_version, validate
 
 # we require the Bash script functionality
 # https://github.com/snakemake/snakemake/blob/main/CHANGELOG.md

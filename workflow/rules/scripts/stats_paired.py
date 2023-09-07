@@ -1,7 +1,8 @@
 from os.path import dirname, basename
 import csv
-import sys
 from collections import defaultdict
+
+from utils import file_logging
 
 
 def write_stats(merge_stats, trim_stats, filter_stats, primer_combinations, outfile):
@@ -63,7 +64,7 @@ def percent(x, y):
 
 
 
-# with file_logging(snakemake.log[0]):
-write_stats(snakemake.input.merge, snakemake.input.trim, snakemake.input.filter,
-            snakemake.params.primer_combinations,
-            snakemake.output[0])
+with file_logging(snakemake.log[0]):
+    write_stats(snakemake.input.merge, snakemake.input.trim, snakemake.input.filter,
+                snakemake.params.primer_combinations,
+                snakemake.output[0])
