@@ -116,12 +116,11 @@ def main(argv = sys.argv[1:]):
         "--use-conda", "--conda-prefix", args.conda_dir,
         "--rerun-incomplete"
     ]
+    cmd = args.target + cmd + other_args
     if args.dev:
         cmd += ["--rerun-triggers", "mtime", "params", "input", "software-env"]
     elif not args.verbose:
         cmd += ["--quiet", "rules"]
-
-    cmd = args.target + cmd + other_args
 
     # Finally, we can run Snakemake
     print("Running: snakemake " + " ".join(cmd), file=sys.stderr)
