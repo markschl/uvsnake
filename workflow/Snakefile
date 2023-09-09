@@ -10,7 +10,6 @@ min_version("7.14.0")
 configfile: "config/config.yaml"
 
 validate(config, "config.schema.yaml")
-# from pprint import pprint; pprint(config)
 
 
 ##### load rules #####
@@ -22,10 +21,10 @@ include: "rules/clean.smk"
 # This allows using this workflow as module
 # (where schema validation can be skipped)
 if "input" in config and "primers" in config:
-    include: "rules/other.smk"
     include: "rules/qc.smk"
     include: "rules/prepare_paired.smk"
     include: "rules/cluster.smk"
+    include: "rules/other.smk"
     include: "rules/targets.smk"
 
 if "sintax" in config:

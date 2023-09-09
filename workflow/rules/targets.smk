@@ -22,6 +22,7 @@ rule unoise3:
             what=["unoise3.fasta", "unoise3_otutab.txt.gz", "unoise3.biom"]
         ),
         rules.stats_paired.output,
+        expand(rules.combine_logs.output, method="unoise3"),
 
 rule uparse:
     input:
@@ -32,6 +33,7 @@ rule uparse:
             what=["uparse.fasta", "uparse_otutab.txt.gz", "uparse.biom"]
         ),
         rules.stats_paired.output,
+        expand(rules.combine_logs.output, method="uparse"),
 
 
 # rule post_cluster:

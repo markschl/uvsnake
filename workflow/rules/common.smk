@@ -1,6 +1,7 @@
 import os
 from os.path import dirname
 from glob import glob
+from collections import OrderedDict
 
 from utils.primers import get_primer_combinations
 from utils.sample_list import SampleList
@@ -19,11 +20,12 @@ if "input" in config and "primers" in config:
     # further add these settings to config (_underscore indicates that they are special)
     config["_primers"], config["_primer_combinations"] = get_primer_combinations(config)
     l = SampleList(config["input"]["sample_file"])
-    sample_names = list(s for s, _ in l.samples())
-    assert len(sample_names) == len(set(sample_names)), "Duplicate sample names found"
-    config["_input"] = dict(l.samples())
-    config["_sample_names"] = sample_names
+    config["_input"] = OrderedDict(l.samples())
+    config["_sample_names"] = list(config["_input"])
+    assert len(config["_sample_names"]) == len(set(config["_sample_names"])), \
+         "Duplicate sample names found"
     config["_layout"] = l.layout
+# from pprint import pprint; pprint(config)
 
 
 #### Helpers ####

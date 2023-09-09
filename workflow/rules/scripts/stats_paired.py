@@ -6,7 +6,8 @@ from utils import file_logging
 
 
 def write_stats(merge_stats, trim_stats, filter_stats, primer_combinations, outfile):
-    # read data
+    # read data into dict with sample names as keys
+    # TODO: depends on file paths
     merge = read_stats(merge_stats, key=lambda f: basename(f).replace("_stats.txt", ""))
     trim = read_stats(trim_stats, key=lambda f: basename(f).replace("_stats.txt", ""))
     flt = read_stats(
