@@ -29,7 +29,7 @@ The following illustration shows an overview of the input files, commands and ou
 
 ![input](docs/input.png)
 
-More details on all available options in `config.yaml` are also available as comments [in the file itself](config/config.yaml).
+More details on all available options in `config.yaml` are also available as comments in the template file [config/config.yaml](config/config.template.yaml).
 
 
 ## Running

@@ -52,7 +52,10 @@ properties:
             type: number
             exclusiveMinimum: 0
             maximum: 1
-        required: [min_overlap, max_error_rate]
+          min_length:
+            type: integer
+            minimum: 1
+        required: [min_overlap, max_error_rate, min_length]
         additionalProperties: false
     if:
       required: [trim_settings]
@@ -107,9 +110,6 @@ properties:
   filter:
     type: object
     properties:
-      min_length:
-        type: integer
-        minimum: 1
       max_error_rate:
         type: number
         minimum: 0

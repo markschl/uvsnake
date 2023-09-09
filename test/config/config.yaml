@@ -30,13 +30,13 @@ primers:
   trim_settings:
     min_overlap: 15
     max_error_rate: 0.1
+    min_length: 100
 
 merge:
   overlap_ident: 75
   max_diffs: 1000
 
 filter:
-  min_length: 100
   max_error_rate: 0.002
 
 # (optional, only needed if 'uparse' rule is run)

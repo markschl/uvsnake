@@ -54,6 +54,7 @@ if ! cmp -s $vout/unoise3_otutab.txt.gz $pout/unoise3_otutab.txt.gz; then
   echo "VSEARCH zOTUs differ ($vres/unoise3_otutab.txt.gz $pout/unoise3_otutab.txt.gz)" >&2
   exit 1
 fi
+echo "VSEARCH 'simple' pipeline does not differ from UVSnake"
 
 # for comparing biom with Meld:
 # meld <(python -m json.tool $vout/unoise3.biom) <(python -m json.tool $pout/unoise3.biom)

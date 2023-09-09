@@ -80,7 +80,7 @@ for f in "$@"; do
         -a "$r_primer" \
         --error-rate $primers_trim_settings_max_error_rate \
         --overlap $primers_trim_settings_min_overlap \
-        --minimum-length $filter_min_length \
+        --minimum-length $primers_trim_settings_min_length \
         --cores $THREADS \
         --discard-untrimmed \
         -o "$outdir"/$s.trimmed.fastq
@@ -105,7 +105,7 @@ for f in "$@"; do
 
     $VSEARCH --fastq_filter "$outdir"/$s.trimmed.fastq \
         --fastq_maxee_rate $filter_max_error_rate \
-        --fastq_minlen $filter_min_length \
+        --fastq_minlen $primers_trim_settings_min_length \
         --fastaout "$outdir"/$s.filtered.fasta \
         --fasta_width 0
     ## these options from the example workflow are not used:
@@ -317,6 +317,7 @@ echo Done
 
 # rename to have common output names
 
-mv otus.fasta unoise3.fasta
 mv otutab.biom unoise3.biom
 gzip -cn otutab.txt > unoise3_otutab.txt.gz
+# make sure low-complexity regions are not lowercase
+st upper --wrap 80 otus.fasta > unoise3.fasta

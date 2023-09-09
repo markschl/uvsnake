@@ -63,7 +63,7 @@ cutadapt "$outdir/trimmed_fwd.fq" \
     -a "$r_primer" \
     --error-rate $primers_trim_settings_max_error_rate \
     --overlap $primers_trim_settings_min_overlap \
-    --minimum-length $filter_min_length \
+    --minimum-length $primers_trim_settings_min_length \
     --cores $threads \
     --discard-untrimmed \
     -o "$outdir/trimmed.fq"

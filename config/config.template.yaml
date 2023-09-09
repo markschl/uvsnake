@@ -59,6 +59,8 @@ primers:
   trim_settings:
     min_overlap: 15
     max_error_rate: 0.25
+    # keep only amplicons of at least this length (shorter may be adapters)
+    min_length: 100
 
 # paired end merging
 # Note on 'program' setting:
@@ -79,8 +81,6 @@ merge:
 # read filtering before denoising/clustering
 # (done by VSEARCH)
 filter:
-  # minimum amplicon length (shorter may be adapters)
-  min_length: 100
   # Maximum per-base error rate
   # (e.g. 0.002 per bp means 0.8 errors per 400 bp)
   max_error_rate: 0.002

@@ -4,7 +4,6 @@
 rule filter_derep:
     params:
         maxee_rate=config["filter"]["max_error_rate"],
-        minlen=config["filter"]["min_length"],  # not absolutely required (done after trimming)
     input:
         expand("workdir/prepare_{layout}/2_trim/{{sample}}/{{primers}}.fastq.zst", layout=config["_layout"]),
     output:

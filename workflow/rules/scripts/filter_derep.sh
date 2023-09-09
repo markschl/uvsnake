@@ -17,7 +17,6 @@ out=$( {
         --fastaout "${snakemake_output[filtered_tmp]}" \
         --fastaout_discarded "${snakemake_output[discarded_tmp]}" \
         --fastq_maxee_rate "${snakemake_params[maxee_rate]}" \
-        --fastq_minlen "${snakemake_params[minlen]}" \
         --fastq_qmax 42
   } 2>&1 )
 

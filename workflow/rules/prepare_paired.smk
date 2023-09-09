@@ -2,7 +2,7 @@ localrules:
     make_primer_fasta,
 
 
-rule usearch_merge_paired:
+rule merge_paired:
     params:
         overlap_ident=config["merge"]["overlap_ident"],
         max_diffs=config["merge"]["max_diffs"],
@@ -47,7 +47,7 @@ rule trim_primers_paired:
     params:
         max_error_rate=config["primers"]["trim_settings"]["max_error_rate"],
         min_overlap=config["primers"]["trim_settings"]["min_overlap"],
-        min_length=config["filter"]["min_length"],
+        min_length=config["primers"]["trim_settings"]["min_length"],
         primer_comb=config["_primer_combinations"],
     input:
         fprimers="workdir/primers/forward.fasta",
