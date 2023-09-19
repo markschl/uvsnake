@@ -22,7 +22,7 @@ rule merge_paired:
     log:
         "logs/prepare_paired/1_merge/{sample}.log",
     conda:
-        "envs/vsearch.yaml"
+        "envs/basic.yaml"
     group:
         "sample"
     script:
@@ -65,7 +65,7 @@ rule trim_primers_paired:
     log:
         "logs/prepare_paired/2_trim/{sample}.log",
     conda:
-        "envs/cutadapt.yaml"
+        "envs/basic.yaml"
     group:
         "sample"
     script:

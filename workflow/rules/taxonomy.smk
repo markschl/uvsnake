@@ -35,7 +35,7 @@ rule assign_taxonomy_sintax:
     group:
         "taxonomy"
     conda:
-        "envs/vsearch.yaml"
+        "envs/basic.yaml"
     # threads:
     # VSEARCH works in parallel (although cores seem to be used only ~50%) while
     # USEARCH v11 does not appear to use more than 1 thread

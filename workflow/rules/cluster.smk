@@ -15,7 +15,7 @@ rule filter_derep:
     log:
         "logs/cluster/1_filter_derep/{primers}/{sample}.log",
     conda:
-        "envs/vsearch.yaml"
+        "envs/basic.yaml"
     group:
         "sample"
     resources:
@@ -43,7 +43,7 @@ rule collect_derep:
     group:
         "denoise"
     conda:
-        "envs/vsearch.yaml"
+        "envs/basic.yaml"
     resources:
         mem_mb=5000,
     shell:
@@ -87,9 +87,7 @@ rule cluster_unoise3:
     log:
         "logs/cluster/3_cluster/{primers}_unoise3.log",
     conda:
-        "envs/vsearch.yaml"
-    group:
-        "cluster"
+        "envs/basic.yaml"
     # threads:
     # VSEARCH works in parallel (although cores seem to be used only ~50%) while
     # USEARCH v11 does not appear to use more than 1 thread
@@ -186,7 +184,7 @@ rule usearch_make_otutab:
 #     log:
 #         "logs/cluster/3_cluster/{primers}_post_cluster.log",
 #     conda:
-#         "envs/vsearch.yaml"
+#         "envs/basic.yaml"
 #     group:
 #         "cluster"
 #     threads:
