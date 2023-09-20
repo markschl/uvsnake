@@ -50,25 +50,25 @@ rule combine_logs:
         exec 1> "{output}"
         echo "Paired-end read merging"
         echo "======================="
-        cat {input.merge:q}
+        tail -n+1 {input.merge:q}
         printf "\n\n\n"
         echo "Primer trimming"
         echo "================"
-        cat {input.trim:q}
+        tail -n+1 {input.trim:q}
         printf "\n\n\n"
         echo "Filter & de-replicate (per-sample)"
         echo "=================================="
-        cat {input.filter_derep:q}
+        tail -n+1 {input.filter_derep:q}
         printf "\n\n\n"
         echo "Combine and de-replicate globally"
         echo "================================="
-        cat {input.collect_derep:q}
+        tail -n+1 {input.collect_derep:q}
         printf "\n\n\n"
         echo "Cluster"
         echo "======="
-        cat {input.cluster:q}
+        tail -n+1 {input.cluster:q}
         printf "\n\n\n"
         echo "OTU tab"
         echo "======="
-        cat {input.otutab:q}
+        tail -n+1 {input.otutab:q}
         """
