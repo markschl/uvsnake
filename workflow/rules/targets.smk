@@ -17,7 +17,7 @@ rule quality_all:
 
 rule unoise3:
     input:
-        rules.config.output,
+        rules.config.input,
         expand(
             "results/{primers}/{what}",
             primers=config["_primer_combinations"],
@@ -28,7 +28,7 @@ rule unoise3:
 
 rule uparse:
     input:
-        rules.config.output,
+        rules.config.input,
         expand(
             "results/{primers}/{what}",
             primers=config["_primer_combinations"],
