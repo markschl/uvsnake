@@ -37,7 +37,9 @@ vsearch -derep_fulllength "${snakemake_output[filtered_tmp]}" \
   -sizeout \
   -output "$good"
 
-# all uniques: used for constructing the OTU table (note -sizein argument)
+# all uniques: used for constructing the OTU table
+# (note -sizein argument, since the filtered sequences are already 
+# de-replicated and thus have size annotations)
 
 cat "$good" "${snakemake_output[discarded_tmp]}" |
   vsearch -derep_fulllength - \
