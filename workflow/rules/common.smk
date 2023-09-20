@@ -11,11 +11,9 @@ from utils.sample_list import SampleList
 
 from snakemake.workflow import srcdir
 
-# Set environment variable of workflow root dir to allow post-deploy
-# scripts to run other scripts stored in that directory
-os.environ['PIPELINE_DIR'] = dirname(dirname(dirname(srcdir('.'))))
-
-# initialize samples if 
+# initialize samples if corresponding sections present in configuration
+# (otherwise we assume that uvsnake is used as Snakemake module and not all 
+# functionality may be needed)
 if "input" in config and "primers" in config:
     # further add these settings to config (_underscore indicates that they are special)
     config["_primers"], config["_primer_combinations"] = get_primer_combinations(config)

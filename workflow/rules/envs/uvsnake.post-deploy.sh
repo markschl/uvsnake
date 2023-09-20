@@ -1,14 +1,9 @@
 #!/bin/bash
 
-set -xeuo pipefail
+set -e
 
-
-if [ $# -eq 0 ]; then
-  echo "Usage: $0 <outdir>" >&2
-  exit 1
-fi
-
-outdir="$1"
+# install seqtool
+outdir="$CONDA_PREFIX/bin"
 
 tag=v0.3.0
 prefix=https://github.com/markschl/seqtool/releases/download/$tag/seqtool-$tag

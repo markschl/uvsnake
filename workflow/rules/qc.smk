@@ -17,7 +17,7 @@ rule fastqc:
     group:
         "sample"
     conda:
-        "envs/fastqc.yaml"
+        "envs/uvsnake.yaml"
     shell:
         """
         outdir=$(dirname "{output[0]}")
@@ -38,7 +38,7 @@ rule multiqc:
     log:
         "logs/qc/multiqc.log",
     conda:
-        "envs/multiqc.yaml"
+        "envs/uvsnake.yaml"
     resources:
         mem_mb=mem_func(1000),
         runtime=time_func(120),
@@ -62,7 +62,7 @@ rule multiqc_all:
     log:
         "logs/qc/multiq_all.log",
     conda:
-        "envs/multiqc.yaml"
+        "envs/uvsnake.yaml"
     resources:
         mem_mb=mem_func(1000),
         runtime=time_func(120),

@@ -12,7 +12,7 @@ rule dump_config:
     log:
         "logs/dump_config.log",
     conda:
-        "envs/basic.yaml"
+        "envs/uvsnake.yaml"
     script:
         "scripts/dump_config.py"
 

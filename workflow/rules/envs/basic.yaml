@@ -1,5 +1,0 @@
-dependencies:
-  - vsearch=2.23
-  - zstd=1.5
-  - pyyaml=6.0
-  - cutadapt=4.4
