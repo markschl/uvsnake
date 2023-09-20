@@ -15,7 +15,6 @@ defaults:
   # These are the default settings by USEARCH and VSEARCH
   # the unoise3, uparse, post_cluster, otutab and sintax commands all
   # accept these settings as well, which overrides these defaults
-  # An exception is post_cluster, which has a default of 64 for both already
   maxaccepts: 1
   maxrejects: 1
 
@@ -39,26 +38,24 @@ primers:
   forward:
     # this is a list with one or several primers (depending on what you have in the run)
     - ITS3-KYO2: GGGATGAAGAACGYAGYRAA
-    - fwd-other: GAACGYAGYRAAGGGATGAA
+    - fITS7: GTGARTCATCGAATCTTTG
   reverse:
     - ITS4:
-        # there may be a mix of different primers, which all start at the
-        # same position in the locus
+        # Instead or in addition to using degenerate primers, there can also
+        # be a mix of different oligos, which all start at the same position
+        # in the locus
         AATCCTCCGCTTATTGATATGC,
         AATCCTCCGCTGAWTAATATGC
-    - rev-other: AATATGCAATCCGCTGAWTTCC
-     # (optional) Primer combinations: either missing, 'all' (has the same effect)
-    # or a list of combinations (see below)
-  combinations: all
-      ## Custom list of combinations:
-      ## Every combination will obtain its own results directory
-      ## The primer combination format must be: "forward...reverse"
-      # - ITS3-KYO2...ITS4
-      # - fITS7...ITS4
+     # (optional) list of primer combinations
+     # (if not supplied, all combinations are used)
+     # Every combination will obtain its own results directory
+  combinations:
+      - ITS3-KYO2...ITS4
+      - fITS7...ITS4
   # Primer trimming settings
   trim_settings:
     min_overlap: 15
-    max_error_rate: 0.25
+    max_error_rate: 0.15
     # keep only amplicons of at least this length (shorter may be adapters)
     min_length: 100
 
@@ -108,25 +105,13 @@ unoise3:
   # maxaccepts: 8
   # maxrejects: 8
 
-# # Post-clustering of UNOISE3 zOTUs at a fixed threshold
-# # using USEARCH/VSEARCH -cluster_size (sizes are taken from OTU table)
-# # (postcluster target rule, creates 'denoised_cluster.fasta')
-# post_cluster:
-#   # identity threshold (percent)
-#   ident_threshold: 97
-#   # (optional settings)
-#   # program: usearch
-#   # search options (these are actually the defaults!)
-#   # maxaccepts: 64
-#   # maxrejects: 64
-
 # Mapping options for creation of OTU table
 # for USEARCH: https://www.drive5.com/usearch/manual/cmd_otutab.html
 # with VSEARCH, we use the standard -usearch_global
 otutab:
   # similarity threshold (USEARCH -otutab uses 97% as default)
   ident_threshold: 97
-  # Creates two additional output files (may be large!):
+  # extra: true will create two additional output files (may be large!):
   # * BAM file for inspection of mapped reads (VSEARCH only)
   # * A TSV file (named ..._search.txt.gz) mapping each read to each cluster.
   # They are placed in workdir/otutab_mapping

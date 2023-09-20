@@ -22,6 +22,8 @@ The workflow follows the [recommendations](https://drive5.com/usearch/manual/upa
 
 Download the [latest release](https://github.com/markschl/uvsnake/releases/latest) and unpack it to some directory. In a terminal, change into the directory (`cd directory`). Also make sure to install [Snakemake](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html) (along with the Conda package manager).
 
+The pipeline is configured to use VSEARCH for all steps, but in case of using USEARCH (`program: usearch`), first obtain the software [here](https://www.drive5.com/usearch/download.html), and make sure that it is installed as `usearch` in `$PATH`. Alternatively, specify the path to USEARCH in the *usearch_binary* section of [`config.yaml`](config/config.template.yaml).
+
 
 ## Input files
 
