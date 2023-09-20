@@ -7,11 +7,13 @@ rule config:
     input:
         rules.dump_config.output,
 
-
 rule quality:
     input:
-        rules.multiqc_paired.output,
+        rules.multiqc.output,
 
+rule quality_all:
+    input:
+        rules.multiqc_all.output,
 
 rule unoise3:
     input:
@@ -34,7 +36,6 @@ rule uparse:
         ),
         rules.stats_paired.output,
         expand(rules.combine_logs.output, method="uparse"),
-
 
 # rule post_cluster:
 #     input:

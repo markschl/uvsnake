@@ -26,27 +26,43 @@ rule fastqc:
         """
 
 
-rule multiqc_paired:
+rule multiqc:
     input:
         fastqc=expand(
             "qc/fastqc/{sample}/{sample}_R{read}_fastqc.html",
             sample=config["_sample_names"],
             read=[1, 2],
         ),
+    output:
+        "qc/multiqc/multiqc_report.html",
+    log:
+        "logs/qc/multiqc.log",
+    conda:
+        "envs/multiqc.yaml"
+    shell:
+        """
+        indir=$(dirname $(dirname {input.fastqc[0]}))
+        multiqc -f -m fastqc -o $(dirname {output}) $indir 2> {log}
+        """
+
+
+rule multiqc_all:
+    input:
+        fastqc=rules.multiqc.input,
         cutadapt=expand(
             "workdir/prepare_paired/2_trim/{sample}/{sample}_{direction}.log",
             sample=config["_sample_names"],
             direction=["fwd", "rev"],
         ),
     output:
-        "qc/multiqc/multiqc_report.html",
+        "qc/multiqc/multiqc_report_all.html",
     log:
-        "logs/qc/multiqc_paired.log",
+        "logs/qc/multiq_all.log",
     conda:
         "envs/multiqc.yaml"
     shell:
         """
-        indir=$(dirname $(dirname {input.fastqc}))
+        indir=$(dirname $(dirname {input.fastqc[0]}))
         outdir=$(dirname {output})
         cutadapt_dir=$(dirname $(dirname {input.cutadapt[0]}))
         multiqc -f -m fastqc -m cutadapt -o $outdir $indir $cutadapt_dir 2> {log}
