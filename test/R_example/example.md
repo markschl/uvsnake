@@ -100,13 +100,13 @@ From the 24 isolates, 21 were matched by at least one OTU. The remaining
 ones had a very low relative concentration in the mix and were thus not
 detected at the given sequencing depth. In theory, it would be possible
 to find more OTUs by lowering the value of `minsize` from the current
-value of `3`, at the expense of obtaining artefact OTUs.The sequence
+value of `3`, at the expense of obtaining artefact OTUs. The sequence
 similarity (`ident`) was always 100%, which is optimal.
 
 ## Taxonomy
 
 Part of the isolates were assigned at the genus and species levels at a
-bootstrap threshold of 0.7, and those names are correct in most cases.
+bootstrap threshold of 0.7, and those names seem mostly correct.
 
 ``` r
 otus <- as(tax_table(physeq), "matrix")
@@ -192,9 +192,10 @@ head(mock_data)
 
 </div>
 
+The plot of mixed vs. detected frequencies shows a clear relationship.
 The *mock2* community is more uneven, concentrations decrease faster
-than in mock1, which is also the reason that less OTUs were found in
-that community.
+than in mock1, resulting in rare sequence variants (zOTUs) not being
+found at the given sequencing depth.
 
 ``` r
 ggplot(mock_data, aes(rel_conc, reads)) +
