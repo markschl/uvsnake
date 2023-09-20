@@ -9,7 +9,7 @@ This [Snakemake](https://snakemake.github.io) workflow aims at providing a simpl
 * Both USEARCH and VSEARCH can be used (configurable individually at every step)
 * *Multiple primer combinations* can be recognized using [Cutadapt](https://cutadapt.readthedocs.io), and subsequent clustering/taxonomy assignment is done separately for every amplicon
 * Quality control using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc) and [MultiQC](https://multiqc.info)
-* *Samples are processed in parallel*, which is beneficial for large projects analyzed on clusters
+* Optimized for large projects with many samples (samples are *processed in parallel*, beneficial if running on a cluster)
 
 ## Workflow
 
@@ -34,7 +34,7 @@ More details on all available options in `config.yaml` are also available as com
 
 ## Running
 
-To run FastQC/MultiQC, UNOISE3 and UPARSE
+To run FastQC/MultiQC, UNOISE3 and UPARSE (assuming `config/config.yaml` to be in `analysis_dir`).
 
 ```sh
 conda activate snakemake
@@ -47,8 +47,7 @@ The equivalent (a bit more complicated) Snakemake command would be:
 snakemake -d analysis_dir -c1 --conda --conda-prefix ~/uvsnake/conda quality unoise3 uparse
 ```
 
-Also note, that the `uvsnake` script assists with processing samples in batches on clusters to prevent many small jobs from being submitted. Otherwise, `uvsnake` accepts the same arguments as `snakemake`, it just sets a few defaults. The full command is always printed when executing.
-
+Apart from setting a few defaults (not all shown here), `uvsnake` can be used like `snakemake`, any number of Snakemake arguments can be added. The full command is always printed when executing. For instance, the script also assists with setting resource constraints on computer clusters and grouping small sample processing jobs into batches.
 
 ![results](docs/results.png)
 
@@ -60,11 +59,17 @@ Assign taxonomy with SINTAX:
 
 ![results](docs/taxonomy.png)
 
-
-### Notes
+### Notes on taxonomy
 
 The *taxonomy* rule should not be run together with the *unoise3* and/or *uparse* rules, but in a separate command *afterwards*. Taxonomic assignments are only done for clusters that are already present. If run before clustering, nothing happens.
 
+### Cluster execution
+
+Executing on computer clusters requires [additional settings](https://snakemake.readthedocs.io/en/stable/executing/cluster.html). Uvsnake already takes care of setting resource constraints as well as possible, but it may make sense to allow restarting failed jobs with `-T/--retries`, in case they failed because of wrong time/memory constraints. Here an example running on a SLURM cluster with a total of three tries:
+
+```sh
+./uvsnake -T 3 --slurm analysis_dir quality unoise3 uparse
+```
 
 ## Example
 

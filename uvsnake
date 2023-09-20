@@ -114,7 +114,12 @@ def main(argv = sys.argv[1:]):
         "--local-cores", str(args.local_cores),
         "--group-components", f"sample={sample_group_size}",
         "--use-conda", "--conda-prefix", args.conda_dir,
-        "--rerun-incomplete"
+        "--rerun-incomplete",
+        # here set default resources for rules from 'sample' group, since
+        # these currently don't accept functions
+        # (https://github.com/snakemake/snakemake/issues/2154#issuecomment-1553538507)
+        "--default-resources",
+        "mem_mb=500*2**(attempt-1)"
     ]
     cmd = args.target + cmd + other_args
     if args.dev:

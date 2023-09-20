@@ -39,6 +39,9 @@ rule multiqc:
         "logs/qc/multiqc.log",
     conda:
         "envs/multiqc.yaml"
+    resources:
+        mem_mb=mem_func(1000),
+        runtime=time_func(120),
     shell:
         """
         indir=$(dirname $(dirname {input.fastqc[0]}))
@@ -60,6 +63,9 @@ rule multiqc_all:
         "logs/qc/multiq_all.log",
     conda:
         "envs/multiqc.yaml"
+    resources:
+        mem_mb=mem_func(1000),
+        runtime=time_func(120),
     shell:
         """
         indir=$(dirname $(dirname {input.fastqc[0]}))

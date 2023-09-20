@@ -30,6 +30,7 @@ if "input" in config and "primers" in config:
 
 #### Helpers ####
 
+
 def with_default(name, group):
     """
     Helper function that obtains a value for program/maxaccepts/maxrejects,
@@ -42,7 +43,22 @@ def with_default(name, group):
         return config["defaults"][name]
     return value
 
+
 def expand_clustered(path, **wildcards):
     for f in glob("results/*/*.fasta"):
         parts = f.split(os.sep)
         yield from expand(path, primers=parts[1], seqs=parts[2].split(".")[0], **wildcards)
+
+
+def mem_func(mem=5, f=0, max_mem=50000):
+    def _mem_func(wildcards, input, attempt):
+        _mem = mem + f * input.size_mb
+        return round(min(max_mem, _mem * 2**(attempt - 1)))
+    return _mem_func
+
+
+def time_func(time=1, f=0, max_time=24*60*20):
+    def _time_func(wildcards, input, attempt):
+        _time = time + f * input.size_mb
+        return round(min(max_time, _time * 2**(attempt - 1)))
+    return _time_func
