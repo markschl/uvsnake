@@ -352,27 +352,30 @@ OTU tab
 + [[ usearch == \v\s\e\a\r\c\h ]]
 + [[ usearch == \u\s\e\a\r\c\h ]]
 ++ mktemp workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.XXXXXX.fasta
-+ uniques=workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.Bh9XVl.fasta
-+ zstd -dqf workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.fasta.zst -o workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.Bh9XVl.fasta
-+ usearch -otutab workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.Bh9XVl.fasta -otus results/ITS3-KYO2...ITS4/unoise3.fasta -id 0.97 -maxaccepts 8 -maxrejects 8 -otutabout results/ITS3-KYO2...ITS4/unoise3_otutab.txt -biomout results/ITS3-KYO2...ITS4/unoise3.biom -notmatched workdir/cluster/4_otutab/ITS3-KYO2...ITS4/unoise3_otutab_notmatched.fasta -threads 1
++ uniques=workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.3a6pgl.fasta
++ zstd -dqf workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.fasta.zst -o workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.3a6pgl.fasta
++ usearch -otutab workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.3a6pgl.fasta -otus results/ITS3-KYO2...ITS4/unoise3.fasta -id 0.97 -maxaccepts 8 -maxrejects 8 -otutabout results/ITS3-KYO2...ITS4/unoise3_otutab.txt -biomout results/ITS3-KYO2...ITS4/unoise3.biom -notmatched workdir/cluster/4_otutab/ITS3-KYO2...ITS4/unoise3_otutab_notmatched.fasta -threads 1
 usearch v11.0.667_i86linux32, 4.0Gb RAM (32.1Gb total), 16 cores
 (C) Copyright 2013-18 Robert C. Edgar, all rights reserved.
 https://drive5.com/usearch
 
 License: <email removed>
 
-00:01 37Mb      0.1% Reading results/ITS3-KYO2...ITS4/unoise3.fasta00:01 41Mb    100.0% Reading results/ITS3-KYO2...ITS4/unoise3.fasta
-00:01 7.1Mb     0.1% Masking (fastnucleo)                          00:01 7.1Mb   100.0% Masking (fastnucleo)
-00:01 7.9Mb     0.1% Word stats          00:01 8.0Mb   100.0% Word stats
-00:01 8.0Mb   100.0% Alloc rows
-00:01 8.0Mb     0.1% Build index00:01 8.0Mb   100.0% Build index
-00:01 41Mb      0.1% Searching all_uniques.Bh9XVl.fasta, 0.0% matched00:02 43Mb     14.2% Searching all_uniques.Bh9XVl.fasta, 97.7% matched00:03 43Mb     28.9% Searching all_uniques.Bh9XVl.fasta, 96.2% matched00:04 43Mb     43.4% Searching all_uniques.Bh9XVl.fasta, 96.1% matched00:05 43Mb     58.2% Searching all_uniques.Bh9XVl.fasta, 96.5% matched00:06 43Mb     74.4% Searching all_uniques.Bh9XVl.fasta, 96.3% matched00:07 43Mb     90.5% Searching all_uniques.Bh9XVl.fasta, 95.7% matched00:07 43Mb    100.0% Searching all_uniques.Bh9XVl.fasta, 95.7% matched
+00:00 37Mb      0.1% Reading results/ITS3-KYO2...ITS4/unoise3.fasta00:00 41Mb    100.0% Reading results/ITS3-KYO2...ITS4/unoise3.fasta
+00:00 7.1Mb     0.1% Masking (fastnucleo)                          00:00 7.1Mb   100.0% Masking (fastnucleo)
+00:00 7.9Mb     0.1% Word stats          00:00 8.0Mb   100.0% Word stats
+00:00 8.0Mb   100.0% Alloc rows
+00:00 8.0Mb     0.1% Build index00:00 8.0Mb   100.0% Build index
+00:00 41Mb      0.1% Searching all_uniques.3a6pgl.fasta, 0.0% matched00:01 43Mb      8.1% Searching all_uniques.3a6pgl.fasta, 100.0% matched00:02 43Mb     23.2% Searching all_uniques.3a6pgl.fasta, 96.7% matched 00:03 43Mb     38.5% Searching all_uniques.3a6pgl.fasta, 96.0% matched00:04 43Mb     53.5% Searching all_uniques.3a6pgl.fasta, 96.2% matched00:05 43Mb     70.0% Searching all_uniques.3a6pgl.fasta, 96.5% matched00:06 43Mb     86.4% Searching all_uniques.3a6pgl.fasta, 95.8% matched00:06 43Mb    100.0% Searching all_uniques.3a6pgl.fasta, 95.7% matched
 90166 / 91478 mapped to OTUs (98.6%)                                  
-00:07 43Mb   Writing results/ITS3-KYO2...ITS4/unoise3_otutab.txt
-00:07 43Mb   Writing results/ITS3-KYO2...ITS4/unoise3_otutab.txt ...done.
-00:07 43Mb   Writing results/ITS3-KYO2...ITS4/unoise3.biom
-00:07 43Mb   Writing results/ITS3-KYO2...ITS4/unoise3.biom ...done.
-+ rm workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.Bh9XVl.fasta
+00:06 43Mb   Writing results/ITS3-KYO2...ITS4/unoise3_otutab.txt
+00:06 43Mb   Writing results/ITS3-KYO2...ITS4/unoise3_otutab.txt ...done.
+00:06 43Mb   Writing results/ITS3-KYO2...ITS4/unoise3.biom
+00:06 43Mb   Writing results/ITS3-KYO2...ITS4/unoise3.biom ...done.
++ rm workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.3a6pgl.fasta
++ mv results/ITS3-KYO2...ITS4/unoise3.biom results/ITS3-KYO2...ITS4/unoise3.biom.tmp
++ python3 -m json.tool --compact results/ITS3-KYO2...ITS4/unoise3.biom.tmp
++ rm results/ITS3-KYO2...ITS4/unoise3.biom.tmp
 + gzip -n results/ITS3-KYO2...ITS4/unoise3_otutab.txt
 + zstd --rm -qf workdir/cluster/4_otutab/ITS3-KYO2...ITS4/unoise3_otutab_notmatched.fasta
 + '[' false = true ']'

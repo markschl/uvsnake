@@ -343,9 +343,9 @@ OTU tab
 + [[ usearch == \v\s\e\a\r\c\h ]]
 + [[ usearch == \u\s\e\a\r\c\h ]]
 ++ mktemp workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.XXXXXX.fasta
-+ uniques=workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.Gy2EHL.fasta
-+ zstd -dqf workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.fasta.zst -o workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.Gy2EHL.fasta
-+ usearch -otutab workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.Gy2EHL.fasta -otus results/ITS3-KYO2...ITS4/uparse.fasta -id 0.97 -maxaccepts 8 -maxrejects 8 -otutabout results/ITS3-KYO2...ITS4/uparse_otutab.txt -biomout results/ITS3-KYO2...ITS4/uparse.biom -notmatched workdir/cluster/4_otutab/ITS3-KYO2...ITS4/uparse_otutab_notmatched.fasta -threads 1
++ uniques=workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.sIi7wl.fasta
++ zstd -dqf workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.fasta.zst -o workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.sIi7wl.fasta
++ usearch -otutab workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.sIi7wl.fasta -otus results/ITS3-KYO2...ITS4/uparse.fasta -id 0.97 -maxaccepts 8 -maxrejects 8 -otutabout results/ITS3-KYO2...ITS4/uparse_otutab.txt -biomout results/ITS3-KYO2...ITS4/uparse.biom -notmatched workdir/cluster/4_otutab/ITS3-KYO2...ITS4/uparse_otutab_notmatched.fasta -threads 1
 usearch v11.0.667_i86linux32, 4.0Gb RAM (32.1Gb total), 16 cores
 (C) Copyright 2013-18 Robert C. Edgar, all rights reserved.
 https://drive5.com/usearch
@@ -357,13 +357,16 @@ License: <email removed>
 00:00 7.9Mb     0.1% Word stats          00:00 8.0Mb   100.0% Word stats
 00:00 8.0Mb   100.0% Alloc rows
 00:00 8.0Mb     0.1% Build index00:00 8.0Mb   100.0% Build index
-00:00 41Mb      0.1% Searching all_uniques.Gy2EHL.fasta, 0.0% matched00:01 43Mb     12.2% Searching all_uniques.Gy2EHL.fasta, 98.6% matched00:02 43Mb     26.7% Searching all_uniques.Gy2EHL.fasta, 96.3% matched00:03 43Mb     39.9% Searching all_uniques.Gy2EHL.fasta, 95.9% matched00:04 43Mb     52.2% Searching all_uniques.Gy2EHL.fasta, 96.0% matched00:05 43Mb     68.2% Searching all_uniques.Gy2EHL.fasta, 96.6% matched00:06 43Mb     84.2% Searching all_uniques.Gy2EHL.fasta, 95.8% matched00:06 43Mb    100.0% Searching all_uniques.Gy2EHL.fasta, 95.6% matched
+00:00 41Mb      0.1% Searching all_uniques.sIi7wl.fasta, 0.0% matched00:01 43Mb     10.7% Searching all_uniques.sIi7wl.fasta, 99.0% matched00:02 43Mb     25.2% Searching all_uniques.sIi7wl.fasta, 96.6% matched00:03 43Mb     40.4% Searching all_uniques.sIi7wl.fasta, 95.9% matched00:04 43Mb     55.5% Searching all_uniques.sIi7wl.fasta, 96.3% matched00:05 43Mb     72.0% Searching all_uniques.sIi7wl.fasta, 96.3% matched00:06 43Mb     88.5% Searching all_uniques.sIi7wl.fasta, 95.7% matched00:06 43Mb    100.0% Searching all_uniques.sIi7wl.fasta, 95.6% matched
 90133 / 91478 mapped to OTUs (98.5%)                                  
 00:06 43Mb   Writing results/ITS3-KYO2...ITS4/uparse_otutab.txt
 00:06 43Mb   Writing results/ITS3-KYO2...ITS4/uparse_otutab.txt ...done.
 00:06 43Mb   Writing results/ITS3-KYO2...ITS4/uparse.biom
 00:06 43Mb   Writing results/ITS3-KYO2...ITS4/uparse.biom ...done.
-+ rm workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.Gy2EHL.fasta
++ rm workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.sIi7wl.fasta
++ mv results/ITS3-KYO2...ITS4/uparse.biom results/ITS3-KYO2...ITS4/uparse.biom.tmp
++ python3 -m json.tool --compact results/ITS3-KYO2...ITS4/uparse.biom.tmp
++ rm results/ITS3-KYO2...ITS4/uparse.biom.tmp
 + gzip -n results/ITS3-KYO2...ITS4/uparse_otutab.txt
 + zstd --rm -qf workdir/cluster/4_otutab/ITS3-KYO2...ITS4/uparse_otutab_notmatched.fasta
 + '[' false = true ']'

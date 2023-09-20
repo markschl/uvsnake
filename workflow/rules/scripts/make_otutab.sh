@@ -57,11 +57,17 @@ elif [[ "${snakemake_params[program]}" == "usearch" ]]; then
         -threads ${snakemake[threads]} \
         1>&2
     rm "$uniques"
-
 else
     echo "unknown program: ${snakemake_params[program]}"
     exit 1
 fi
+
+# Normalize BIOM output, make it more compact
+# Note: this is especially important because USEARCH can produce invalid trailing
+#  commas, which then cause problems when reading by biom-format tools
+mv "${snakemake_output[biom]}" "${snakemake_output[biom]}.tmp"
+python3 -m json.tool --compact "${snakemake_output[biom]}.tmp" > "${snakemake_output[biom]}"
+rm "${snakemake_output[biom]}.tmp"
 
 # compress the output
 gzip -n "${snakemake_output[tab]%.gz}"
