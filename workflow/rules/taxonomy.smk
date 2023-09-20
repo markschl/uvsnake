@@ -80,7 +80,7 @@ rule make_tax_biom:
         tax_tmp=temp("workdir/{primers}/{what}_{method}_tax_tmp.txt"),
         biom="results/{primers}/{what}_{method}.biom.gz",
     log:
-        "logs/taxonomy/{primers}/{what}_{method}_make_tax_biom.log",
+        "logs/sintax/{primers}/{what}_{method}_make_tax_biom.log",
     conda:
         "envs/biom.yaml"
     group:
