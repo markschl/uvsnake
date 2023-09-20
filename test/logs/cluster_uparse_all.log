@@ -25,7 +25,7 @@ Merging
   Keep read labels
 
 00:00 72Mb   FASTQ base 33 for file workdir/prepare_paired/1_merge/mock1/tmp/R1.fastq
-00:00 72Mb      0.1% 0% merged00:00 73Mb    100.0% 98.8% merged
+00:00 72Mb      0.1% 0% merged00:01 73Mb     17.6% 99.0% merged00:01 73Mb    100.0% 98.8% merged
 
 Totals:
      41761  Pairs (41.8k)
@@ -77,7 +77,7 @@ Merging
   Keep read labels
 
 00:00 72Mb   FASTQ base 33 for file workdir/prepare_paired/1_merge/mock2/tmp/R1.fastq
-00:00 72Mb      0.1% 0% merged00:00 73Mb    100.0% 98.9% merged
+00:00 72Mb      0.1% 0% merged00:01 73Mb     93.6% 98.9% merged00:01 73Mb    100.0% 98.9% merged
 
 Totals:
      53711  Pairs (53.7k)
@@ -166,8 +166,8 @@ Primer trimming
 + short_file=workdir/prepare_paired/2_trim/mock2/too_short.fastq
 + zstd -dcq workdir/prepare_paired/1_merge/mock2/mock2.fastq.zst
 + cutadapt - -g file:workdir/primers/forward.fasta --suffix ' fwd={name}' --error-rate 0.1 --overlap 15 --no-indels -o workdir/prepare_paired/2_trim/mock2/__trim_fwd.fastq
-+ cutadapt workdir/prepare_paired/2_trim/mock2/__trim_fwd.fastq -a file:workdir/primers/reverse_rev.fasta --suffix ' rev={name}' --minimum-length 100 --too-short-output workdir/prepare_paired/2_trim/mock2/too_short.fastq --error-rate 0.1 --overlap 15 --no-indels
 + st split --fq -o 'workdir/prepare_paired/2_trim/mock2/{a:fwd}...{a:rev}.fastq'
++ cutadapt workdir/prepare_paired/2_trim/mock2/__trim_fwd.fastq -a file:workdir/primers/reverse_rev.fasta --suffix ' rev={name}' --minimum-length 100 --too-short-output workdir/prepare_paired/2_trim/mock2/too_short.fastq --error-rate 0.1 --overlap 15 --no-indels
 + rm workdir/prepare_paired/2_trim/mock2/__trim_fwd.fastq
 + shopt -s nullglob
 + for comb in ${snakemake_params[primer_comb]}
@@ -245,8 +245,8 @@ Sorting 100%
 5353 unique sequences, avg cluster 4.5, median 1, max 4266
 Writing FASTA output file 100%
 + cat workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock1/mock1_good_uniques.fasta workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock1/mock1_discarded.fasta
-+ vsearch -derep_fulllength - -sizein -sizeout -output -
 + zstd -cq
++ vsearch -derep_fulllength - -sizein -sizeout -output -
 vsearch v2.23.0_linux_x86_64, 30.6GB RAM, 16 cores
 https://github.com/torognes/vsearch
 
@@ -292,8 +292,8 @@ Sorting 100%
 4930 unique sequences, avg cluster 6.5, median 1, max 7648
 Writing FASTA output file 100%
 + cat workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock2/mock2_good_uniques.fasta workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock2/mock2_discarded.fasta
-+ vsearch -derep_fulllength - -sizein -sizeout -output -
 + zstd -cq
++ vsearch -derep_fulllength - -sizein -sizeout -output -
 vsearch v2.23.0_linux_x86_64, 30.6GB RAM, 16 cores
 https://github.com/torognes/vsearch
 
@@ -343,9 +343,9 @@ OTU tab
 + [[ usearch == \v\s\e\a\r\c\h ]]
 + [[ usearch == \u\s\e\a\r\c\h ]]
 ++ mktemp workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.XXXXXX.fasta
-+ uniques=workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.sIi7wl.fasta
-+ zstd -dqf workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.fasta.zst -o workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.sIi7wl.fasta
-+ usearch -otutab workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.sIi7wl.fasta -otus results/ITS3-KYO2...ITS4/uparse.fasta -id 0.97 -maxaccepts 8 -maxrejects 8 -otutabout results/ITS3-KYO2...ITS4/uparse_otutab.txt -biomout results/ITS3-KYO2...ITS4/uparse.biom -notmatched workdir/cluster/4_otutab/ITS3-KYO2...ITS4/uparse_otutab_notmatched.fasta -threads 1
++ uniques=workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.QAU78F.fasta
++ zstd -dqf workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.fasta.zst -o workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.QAU78F.fasta
++ usearch -otutab workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.QAU78F.fasta -otus results/ITS3-KYO2...ITS4/uparse.fasta -id 0.97 -maxaccepts 8 -maxrejects 8 -otutabout results/ITS3-KYO2...ITS4/uparse_otutab.txt -notmatched workdir/cluster/4_otutab/ITS3-KYO2...ITS4/uparse_otutab_notmatched.fasta -threads 1
 usearch v11.0.667_i86linux32, 4.0Gb RAM (32.1Gb total), 16 cores
 (C) Copyright 2013-18 Robert C. Edgar, all rights reserved.
 https://drive5.com/usearch
@@ -357,13 +357,12 @@ License: <email removed>
 00:00 7.9Mb     0.1% Word stats          00:00 8.0Mb   100.0% Word stats
 00:00 8.0Mb   100.0% Alloc rows
 00:00 8.0Mb     0.1% Build index00:00 8.0Mb   100.0% Build index
-00:00 41Mb      0.1% Searching all_uniques.sIi7wl.fasta, 0.0% matched00:01 43Mb     10.7% Searching all_uniques.sIi7wl.fasta, 99.0% matched00:02 43Mb     25.2% Searching all_uniques.sIi7wl.fasta, 96.6% matched00:03 43Mb     40.4% Searching all_uniques.sIi7wl.fasta, 95.9% matched00:04 43Mb     55.5% Searching all_uniques.sIi7wl.fasta, 96.3% matched00:05 43Mb     72.0% Searching all_uniques.sIi7wl.fasta, 96.3% matched00:06 43Mb     88.5% Searching all_uniques.sIi7wl.fasta, 95.7% matched00:06 43Mb    100.0% Searching all_uniques.sIi7wl.fasta, 95.6% matched
+00:00 41Mb      0.1% Searching all_uniques.QAU78F.fasta, 0.0% matched00:01 43Mb      1.0% Searching all_uniques.QAU78F.fasta, 99.6% matched00:02 43Mb     14.8% Searching all_uniques.QAU78F.fasta, 97.6% matched00:03 43Mb     29.9% Searching all_uniques.QAU78F.fasta, 96.0% matched00:04 43Mb     44.9% Searching all_uniques.QAU78F.fasta, 95.9% matched00:05 43Mb     60.5% Searching all_uniques.QAU78F.fasta, 96.5% matched00:06 43Mb     77.1% Searching all_uniques.QAU78F.fasta, 96.2% matched00:07 43Mb     93.6% Searching all_uniques.QAU78F.fasta, 95.6% matched00:07 43Mb    100.0% Searching all_uniques.QAU78F.fasta, 95.6% matched
 90133 / 91478 mapped to OTUs (98.5%)                                  
-00:06 43Mb   Writing results/ITS3-KYO2...ITS4/uparse_otutab.txt
-00:06 43Mb   Writing results/ITS3-KYO2...ITS4/uparse_otutab.txt ...done.
-00:06 43Mb   Writing results/ITS3-KYO2...ITS4/uparse.biom
-00:06 43Mb   Writing results/ITS3-KYO2...ITS4/uparse.biom ...done.
-+ rm workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.sIi7wl.fasta
+00:07 43Mb   Writing results/ITS3-KYO2...ITS4/uparse_otutab.txt
+00:07 43Mb   Writing results/ITS3-KYO2...ITS4/uparse_otutab.txt ...done.
++ rm workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.QAU78F.fasta
++ biom convert -i results/ITS3-KYO2...ITS4/uparse_otutab.txt -o results/ITS3-KYO2...ITS4/uparse.biom --table-type 'OTU table' --to-json
 + mv results/ITS3-KYO2...ITS4/uparse.biom results/ITS3-KYO2...ITS4/uparse.biom.tmp
 + python3 -m json.tool --compact results/ITS3-KYO2...ITS4/uparse.biom.tmp
 + rm results/ITS3-KYO2...ITS4/uparse.biom.tmp

@@ -52,11 +52,23 @@ elif [[ "${snakemake_params[program]}" == "usearch" ]]; then
         -maxaccepts "${snakemake_params[maxaccepts]}" \
         -maxrejects "${snakemake_params[maxrejects]}" \
         -otutabout "${snakemake_output[tab]%.gz}" \
-        -biomout "${snakemake_output[biom]}" \
         -notmatched "${snakemake_output[notmatched]%.zst}" \
         -threads ${snakemake[threads]} \
         1>&2
+        # -biomout "${snakemake_output[biom]}" \
     rm "$uniques"
+
+    # Convert OTU tab to BIOM
+    # This is done because USEARCH -biomout can return an
+    # invalid trailing comma in the sparse count table,
+    # which can break import routines
+    biom convert -i "${snakemake_output[tab]%.gz}" \
+        -o "${snakemake_output[biom]}" \
+        --table-type 'OTU table' --to-json
+    # Alternative: edit the JSON directly (not well tested)
+    # end="$(tail -n3 "${snakemake_output[biom]}")"
+    # truncate -s -$(wc -c <<< "$end") "${snakemake_output[biom]}"
+    # echo $end | sed -E 's/\], *\] *\} *$/]]}/g' >> "${snakemake_output[biom]}"
 else
     echo "unknown program: ${snakemake_params[program]}"
     exit 1
