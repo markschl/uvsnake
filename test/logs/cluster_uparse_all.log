@@ -1,0 +1,369 @@
+Paired-end read merging
+=======================
+==> logs/prepare_paired/1_merge/mock1.log <==
++ tempdir=workdir/prepare_paired/1_merge/mock1/tmp
++ mkdir -p workdir/prepare_paired/1_merge/mock1/tmp
++ gzip -dc fastq/mock1_R1.fastq.gz
++ gzip -dc fastq/mock1_R2.fastq.gz
++ [[ usearch == \v\s\e\a\r\c\h ]]
++ [[ usearch == \u\s\e\a\r\c\h ]]
++ extra='-fastq_pctid 75'
++ bin=usearch
+++ python3
++ tempdir=workdir/prepare_paired/1_merge/mock1/tmp
+++ usearch -fastq_mergepairs workdir/prepare_paired/1_merge/mock1/tmp/R1.fastq --reverse workdir/prepare_paired/1_merge/mock1/tmp/R2.fastq -fastqout workdir/prepare_paired/1_merge/mock1/tmp/merged.fastq -fastqout_notmerged_fwd workdir/prepare_paired/1_merge/mock1/tmp/notmerged_R1.fastq -fastqout_notmerged_rev workdir/prepare_paired/1_merge/mock1/tmp/notmerged_R2.fastq -fastq_maxdiffs 1000 -threads 1 -fastq_pctid 75
++ output='usearch v11.0.667_i86linux32, 4.0Gb RAM (32.1Gb total), 16 cores
+(C) Copyright 2013-18 Robert C. Edgar, all rights reserved.
+https://drive5.com/usearch
+
+License: <email removed>
+
+
+Merging
+  Fwd workdir/prepare_paired/1_merge/mock1/tmp/R1.fastq
+  Rev workdir/prepare_paired/1_merge/mock1/tmp/R2.fastq
+  Keep read labels
+
+00:00 72Mb   FASTQ base 33 for file workdir/prepare_paired/1_merge/mock1/tmp/R1.fastq
+00:00 72Mb      0.1% 0% merged00:00 73Mb    100.0% 98.8% merged
+
+Totals:
+     41761  Pairs (41.8k)
+     41256  Merged (41.3k, 98.79%)
+     17136  Alignments with zero diffs (41.03%)
+       340  Too many diffs (> 1000) (0.81%)
+       165  No alignment found (0.40%)
+         0  Alignment too short (< 16) (0.00%)
+       761  Staggered pairs (1.82%) merged & trimmed
+    202.18  Mean alignment length
+    391.94  Mean merged length
+      0.30  Mean fwd expected errors
+      0.30  Mean rev expected errors
+      1.83  Mean merged expected errors'
+++ grep ' Pairs'
+++ sed -E 's/ *([0-9]+) *Pairs.*/\1/g'
++ n=41761
+++ grep ' Merged'
+++ sed -E 's/ *([0-9]+) *Merged.*/\1/g'
++ n_merged=41256
++ printf '41761\t41256'
++ zstd -qc workdir/prepare_paired/1_merge/mock1/tmp/merged.fastq
++ zstd -qc workdir/prepare_paired/1_merge/mock1/tmp/notmerged_R1.fastq
++ zstd -qc workdir/prepare_paired/1_merge/mock1/tmp/notmerged_R2.fastq
++ rm workdir/prepare_paired/1_merge/mock1/tmp/R1.fastq workdir/prepare_paired/1_merge/mock1/tmp/R2.fastq workdir/prepare_paired/1_merge/mock1/tmp/merged.fastq workdir/prepare_paired/1_merge/mock1/tmp/notmerged_R1.fastq workdir/prepare_paired/1_merge/mock1/tmp/notmerged_R2.fastq
+
+==> logs/prepare_paired/1_merge/mock2.log <==
++ tempdir=workdir/prepare_paired/1_merge/mock2/tmp
++ mkdir -p workdir/prepare_paired/1_merge/mock2/tmp
++ gzip -dc fastq/mock2_R1.fastq.gz
++ gzip -dc fastq/mock2_R2.fastq.gz
++ [[ usearch == \v\s\e\a\r\c\h ]]
++ [[ usearch == \u\s\e\a\r\c\h ]]
++ extra='-fastq_pctid 75'
++ bin=usearch
+++ python3
++ tempdir=workdir/prepare_paired/1_merge/mock2/tmp
+++ usearch -fastq_mergepairs workdir/prepare_paired/1_merge/mock2/tmp/R1.fastq --reverse workdir/prepare_paired/1_merge/mock2/tmp/R2.fastq -fastqout workdir/prepare_paired/1_merge/mock2/tmp/merged.fastq -fastqout_notmerged_fwd workdir/prepare_paired/1_merge/mock2/tmp/notmerged_R1.fastq -fastqout_notmerged_rev workdir/prepare_paired/1_merge/mock2/tmp/notmerged_R2.fastq -fastq_maxdiffs 1000 -threads 1 -fastq_pctid 75
++ output='usearch v11.0.667_i86linux32, 4.0Gb RAM (32.1Gb total), 16 cores
+(C) Copyright 2013-18 Robert C. Edgar, all rights reserved.
+https://drive5.com/usearch
+
+License: <email removed>
+
+
+Merging
+  Fwd workdir/prepare_paired/1_merge/mock2/tmp/R1.fastq
+  Rev workdir/prepare_paired/1_merge/mock2/tmp/R2.fastq
+  Keep read labels
+
+00:00 72Mb   FASTQ base 33 for file workdir/prepare_paired/1_merge/mock2/tmp/R1.fastq
+00:00 72Mb      0.1% 0% merged00:00 73Mb    100.0% 98.9% merged
+
+Totals:
+     53711  Pairs (53.7k)
+     53140  Merged (53.1k, 98.94%)
+     21654  Alignments with zero diffs (40.32%)
+       382  Too many diffs (> 1000) (0.71%)
+       189  No alignment found (0.35%)
+         0  Alignment too short (< 16) (0.00%)
+        90  Staggered pairs (0.17%) merged & trimmed
+    240.85  Mean alignment length
+    359.80  Mean merged length
+      0.30  Mean fwd expected errors
+      0.30  Mean rev expected errors
+      1.75  Mean merged expected errors'
+++ grep ' Pairs'
+++ sed -E 's/ *([0-9]+) *Pairs.*/\1/g'
++ n=53711
+++ grep ' Merged'
+++ sed -E 's/ *([0-9]+) *Merged.*/\1/g'
++ n_merged=53140
++ printf '53711\t53140'
++ zstd -qc workdir/prepare_paired/1_merge/mock2/tmp/merged.fastq
++ zstd -qc workdir/prepare_paired/1_merge/mock2/tmp/notmerged_R1.fastq
++ zstd -qc workdir/prepare_paired/1_merge/mock2/tmp/notmerged_R2.fastq
++ rm workdir/prepare_paired/1_merge/mock2/tmp/R1.fastq workdir/prepare_paired/1_merge/mock2/tmp/R2.fastq workdir/prepare_paired/1_merge/mock2/tmp/merged.fastq workdir/prepare_paired/1_merge/mock2/tmp/notmerged_R1.fastq workdir/prepare_paired/1_merge/mock2/tmp/notmerged_R2.fastq
+
+
+
+Primer trimming
+================
+==> logs/prepare_paired/2_trim/mock1.log <==
++ split_files=("${snakemake_output[by_primers]}")
+++ dirname workdir/prepare_paired/2_trim/mock1/ITS3-KYO2...ITS4.fastq.zst
++ outdir=workdir/prepare_paired/2_trim/mock1
++ mkdir -p workdir/prepare_paired/2_trim/mock1
++ fwd_out=workdir/prepare_paired/2_trim/mock1/__trim_fwd.fastq
++ short_file=workdir/prepare_paired/2_trim/mock1/too_short.fastq
++ zstd -dcq workdir/prepare_paired/1_merge/mock1/mock1.fastq.zst
++ cutadapt - -g file:workdir/primers/forward.fasta --suffix ' fwd={name}' --error-rate 0.1 --overlap 15 --no-indels -o workdir/prepare_paired/2_trim/mock1/__trim_fwd.fastq
++ cutadapt workdir/prepare_paired/2_trim/mock1/__trim_fwd.fastq -a file:workdir/primers/reverse_rev.fasta --suffix ' rev={name}' --minimum-length 100 --too-short-output workdir/prepare_paired/2_trim/mock1/too_short.fastq --error-rate 0.1 --overlap 15 --no-indels
++ st split --fq -o 'workdir/prepare_paired/2_trim/mock1/{a:fwd}...{a:rev}.fastq'
++ rm workdir/prepare_paired/2_trim/mock1/__trim_fwd.fastq
++ shopt -s nullglob
++ for comb in ${snakemake_params[primer_comb]}
++ '[' -f workdir/prepare_paired/2_trim/mock1/ITS3-KYO2...ITS4.fastq ']'
++ zstd --rm -qf workdir/prepare_paired/2_trim/mock1/ITS3-KYO2...ITS4.fastq
++ '[' -e workdir/prepare_paired/2_trim/mock1/too_short.fastq ']'
++ zstd -qf --rm workdir/prepare_paired/2_trim/mock1/too_short.fastq
++ for f in "$outdir/"no_adapter...*.fastq
++ zstd --rm -qf workdir/prepare_paired/2_trim/mock1/no_adapter...ITS4.fastq
++ for f in "$outdir/"no_adapter...*.fastq
++ zstd --rm -qf workdir/prepare_paired/2_trim/mock1/no_adapter...no_adapter.fastq
++ for f in "$outdir/"*...no_adapter.fastq
++ zstd --rm -qf workdir/prepare_paired/2_trim/mock1/ITS3-KYO2...no_adapter.fastq
++ sed -i -E 's/(Command line parameters[^$]+$)/\1 mock1.fastq.gz/g' workdir/prepare_paired/2_trim/mock1/mock1_fwd.log
++ sed -i -E 's/(Command line parameters[^$]+$)/\1 mock1.fastq.gz/g' workdir/prepare_paired/2_trim/mock1/mock1_rev.log
++ grep -q 'No reads processed!' workdir/prepare_paired/2_trim/mock1/mock1_fwd.log
+++ grep 'Total reads processed' workdir/prepare_paired/2_trim/mock1/mock1_fwd.log
+++ extract_num
+++ sed -E 's/[^0-9]+([0-9,]+).*/\1/g'
+++ tr -d ,
++ n=41256
+++ grep 'Reads with adapters' workdir/prepare_paired/2_trim/mock1/mock1_fwd.log
+++ extract_num
+++ sed -E 's/[^0-9]+([0-9,]+).*/\1/g'
+++ tr -d ,
++ n_trimmed_f=40182
+++ grep 'Reads with adapters' workdir/prepare_paired/2_trim/mock1/mock1_rev.log
+++ extract_num
+++ sed -E 's/[^0-9]+([0-9,]+).*/\1/g'
+++ tr -d ,
++ n_trimmed_r=40614
+++ grep 'Reads written' workdir/prepare_paired/2_trim/mock1/mock1_rev.log
+++ extract_num
+++ sed -E 's/[^0-9]+([0-9,]+).*/\1/g'
+++ tr -d ,
++ n_long=40534
++ printf '41256\t40182\t40614\t40534'
+
+==> logs/prepare_paired/2_trim/mock2.log <==
++ split_files=("${snakemake_output[by_primers]}")
+++ dirname workdir/prepare_paired/2_trim/mock2/ITS3-KYO2...ITS4.fastq.zst
++ outdir=workdir/prepare_paired/2_trim/mock2
++ mkdir -p workdir/prepare_paired/2_trim/mock2
++ fwd_out=workdir/prepare_paired/2_trim/mock2/__trim_fwd.fastq
++ short_file=workdir/prepare_paired/2_trim/mock2/too_short.fastq
++ zstd -dcq workdir/prepare_paired/1_merge/mock2/mock2.fastq.zst
++ cutadapt - -g file:workdir/primers/forward.fasta --suffix ' fwd={name}' --error-rate 0.1 --overlap 15 --no-indels -o workdir/prepare_paired/2_trim/mock2/__trim_fwd.fastq
++ cutadapt workdir/prepare_paired/2_trim/mock2/__trim_fwd.fastq -a file:workdir/primers/reverse_rev.fasta --suffix ' rev={name}' --minimum-length 100 --too-short-output workdir/prepare_paired/2_trim/mock2/too_short.fastq --error-rate 0.1 --overlap 15 --no-indels
++ st split --fq -o 'workdir/prepare_paired/2_trim/mock2/{a:fwd}...{a:rev}.fastq'
++ rm workdir/prepare_paired/2_trim/mock2/__trim_fwd.fastq
++ shopt -s nullglob
++ for comb in ${snakemake_params[primer_comb]}
++ '[' -f workdir/prepare_paired/2_trim/mock2/ITS3-KYO2...ITS4.fastq ']'
++ zstd --rm -qf workdir/prepare_paired/2_trim/mock2/ITS3-KYO2...ITS4.fastq
++ '[' -e workdir/prepare_paired/2_trim/mock2/too_short.fastq ']'
++ zstd -qf --rm workdir/prepare_paired/2_trim/mock2/too_short.fastq
++ for f in "$outdir/"no_adapter...*.fastq
++ zstd --rm -qf workdir/prepare_paired/2_trim/mock2/no_adapter...ITS4.fastq
++ for f in "$outdir/"no_adapter...*.fastq
++ zstd --rm -qf workdir/prepare_paired/2_trim/mock2/no_adapter...no_adapter.fastq
++ for f in "$outdir/"*...no_adapter.fastq
++ zstd --rm -qf workdir/prepare_paired/2_trim/mock2/ITS3-KYO2...no_adapter.fastq
++ sed -i -E 's/(Command line parameters[^$]+$)/\1 mock2.fastq.gz/g' workdir/prepare_paired/2_trim/mock2/mock2_fwd.log
++ sed -i -E 's/(Command line parameters[^$]+$)/\1 mock2.fastq.gz/g' workdir/prepare_paired/2_trim/mock2/mock2_rev.log
++ grep -q 'No reads processed!' workdir/prepare_paired/2_trim/mock2/mock2_fwd.log
+++ grep 'Total reads processed' workdir/prepare_paired/2_trim/mock2/mock2_fwd.log
+++ extract_num
+++ sed -E 's/[^0-9]+([0-9,]+).*/\1/g'
+++ tr -d ,
++ n=53140
+++ grep 'Reads with adapters' workdir/prepare_paired/2_trim/mock2/mock2_fwd.log
+++ extract_num
+++ sed -E 's/[^0-9]+([0-9,]+).*/\1/g'
+++ tr -d ,
++ n_trimmed_f=52670
+++ grep 'Reads with adapters' workdir/prepare_paired/2_trim/mock2/mock2_rev.log
+++ extract_num
+++ sed -E 's/[^0-9]+([0-9,]+).*/\1/g'
+++ tr -d ,
++ n_trimmed_r=52371
+++ grep 'Reads written' workdir/prepare_paired/2_trim/mock2/mock2_rev.log
+++ extract_num
+++ sed -E 's/[^0-9]+([0-9,]+).*/\1/g'
+++ tr -d ,
++ n_long=53083
++ printf '53140\t52670\t52371\t53083'
+
+
+
+Filter & de-replicate (per-sample)
+==================================
+==> logs/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock1.log <==
++ sample=mock1
++ out='++ zstd -dcq workdir/prepare_paired/2_trim/mock1/ITS3-KYO2...ITS4.fastq.zst
+++ st set -i '\''mock1.{num}'\'' --fq
+++ st del -d --fq
+++ vsearch -fastq_filter - --fastaout workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock1/mock1_filtered.fasta --fastaout_discarded workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock1/mock1_discarded.fasta --fastq_maxee_rate 0.002 --fastq_qmax 42
+vsearch v2.23.0_linux_x86_64, 30.6GB RAM, 16 cores
+https://github.com/torognes/vsearch
+
+Reading input file 100%
+23822 sequences kept (of which 0 truncated), 15746 sequences discarded.'
++ grep 'sequences kept'
++ sed -E 's/ *([0-9]+)[^,]+, *([0-9]+).*/\1 \2/g'
++ tr ' ' '\t'
++ cat
+++ zstd -dcq workdir/prepare_paired/2_trim/mock1/ITS3-KYO2...ITS4.fastq.zst
+++ st set -i 'mock1.{num}' --fq
+++ st del -d --fq
+++ vsearch -fastq_filter - --fastaout workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock1/mock1_filtered.fasta --fastaout_discarded workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock1/mock1_discarded.fasta --fastq_maxee_rate 0.002 --fastq_qmax 42
+vsearch v2.23.0_linux_x86_64, 30.6GB RAM, 16 cores
+https://github.com/torognes/vsearch
+
+Reading input file 100%
+23822 sequences kept (of which 0 truncated), 15746 sequences discarded.
++ good=workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock1/mock1_good_uniques.fasta
++ vsearch -derep_fulllength workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock1/mock1_filtered.fasta -sizeout -output workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock1/mock1_good_uniques.fasta
+vsearch v2.23.0_linux_x86_64, 30.6GB RAM, 16 cores
+https://github.com/torognes/vsearch
+
+Dereplicating file workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock1/mock1_filtered.fasta 100%
+8285615 nt in 23822 seqs, min 269, max 509, avg 348
+Sorting 100%
+5353 unique sequences, avg cluster 4.5, median 1, max 4266
+Writing FASTA output file 100%
++ cat workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock1/mock1_good_uniques.fasta workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock1/mock1_discarded.fasta
++ vsearch -derep_fulllength - -sizein -sizeout -output -
++ zstd -cq
+vsearch v2.23.0_linux_x86_64, 30.6GB RAM, 16 cores
+https://github.com/torognes/vsearch
+
+Dereplicating file - 100%
+7412864 nt in 21099 seqs, min 258, max 509, avg 351
+Sorting 100%
+14929 unique sequences, avg cluster 2.7, median 1, max 4988
+Writing FASTA output file 100%
++ zstd -fq --rm workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock1/mock1_good_uniques.fasta
+
+==> logs/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock2.log <==
++ sample=mock2
++ out='++ zstd -dcq workdir/prepare_paired/2_trim/mock2/ITS3-KYO2...ITS4.fastq.zst
+++ st set -i '\''mock2.{num}'\'' --fq
+++ st del -d --fq
+++ vsearch -fastq_filter - --fastaout workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock2/mock2_filtered.fasta --fastaout_discarded workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock2/mock2_discarded.fasta --fastq_maxee_rate 0.002 --fastq_qmax 42
+vsearch v2.23.0_linux_x86_64, 30.6GB RAM, 16 cores
+https://github.com/torognes/vsearch
+
+Reading input file 100%
+31845 sequences kept (of which 0 truncated), 20065 sequences discarded.'
++ grep 'sequences kept'
++ sed -E 's/ *([0-9]+)[^,]+, *([0-9]+).*/\1 \2/g'
++ tr ' ' '\t'
++ cat
+++ zstd -dcq workdir/prepare_paired/2_trim/mock2/ITS3-KYO2...ITS4.fastq.zst
+++ st set -i 'mock2.{num}' --fq
+++ st del -d --fq
+++ vsearch -fastq_filter - --fastaout workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock2/mock2_filtered.fasta --fastaout_discarded workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock2/mock2_discarded.fasta --fastq_maxee_rate 0.002 --fastq_qmax 42
+vsearch v2.23.0_linux_x86_64, 30.6GB RAM, 16 cores
+https://github.com/torognes/vsearch
+
+Reading input file 100%
+31845 sequences kept (of which 0 truncated), 20065 sequences discarded.
++ good=workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock2/mock2_good_uniques.fasta
++ vsearch -derep_fulllength workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock2/mock2_filtered.fasta -sizeout -output workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock2/mock2_good_uniques.fasta
+vsearch v2.23.0_linux_x86_64, 30.6GB RAM, 16 cores
+https://github.com/torognes/vsearch
+
+Dereplicating file workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock2/mock2_filtered.fasta 100%
+9981174 nt in 31845 seqs, min 119, max 410, avg 313
+Sorting 100%
+4930 unique sequences, avg cluster 6.5, median 1, max 7648
+Writing FASTA output file 100%
++ cat workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock2/mock2_good_uniques.fasta workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock2/mock2_discarded.fasta
++ vsearch -derep_fulllength - -sizein -sizeout -output -
++ zstd -cq
+vsearch v2.23.0_linux_x86_64, 30.6GB RAM, 16 cores
+https://github.com/torognes/vsearch
+
+Dereplicating file - 100%
+7814160 nt in 24995 seqs, min 119, max 410, avg 313
+Sorting 100%
+15074 unique sequences, avg cluster 3.4, median 1, max 9955
+Writing FASTA output file 100%
++ zstd -fq --rm workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock2/mock2_good_uniques.fasta
+
+
+
+Combine and de-replicate globally
+=================================
++ zstd -dcq workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock1/mock1_good_uniques.fasta.zst workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock2/mock2_good_uniques.fasta.zst
++ vsearch -derep_fulllength - -sizein -sizeout -output -
++ zstd -cq
+vsearch v2.23.0_linux_x86_64, 30.6GB RAM, 16 cores
+https://github.com/torognes/vsearch
+
+Dereplicating file - 100%
+3456877 nt in 10283 seqs, min 119, max 509, avg 336
+Sorting 100%
+9810 unique sequences, avg cluster 5.7, median 1, max 7649
+Writing FASTA output file 100%
++ zstd -dcq workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock1/mock1_all_uniques.fasta.zst workdir/cluster/1_filter_derep/ITS3-KYO2...ITS4/mock2/mock2_all_uniques.fasta.zst
++ zstd -cq
+
+
+
+Cluster
+=======
++ zstd -dcq workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/good_uniques.fasta.zst
++ usearch -cluster_otus results/ITS3-KYO2...ITS4/uparse_input_tmp.fasta -otus results/ITS3-KYO2...ITS4/uparse.fasta -relabel Otu -maxaccepts 1 -maxrejects 1 -minsize 2
+usearch v11.0.667_i86linux32, 4.0Gb RAM (32.1Gb total), 16 cores
+(C) Copyright 2013-18 Robert C. Edgar, all rights reserved.
+https://drive5.com/usearch
+
+License: <email removed>
+
+00:00 39Mb      0.1% 0 OTUs, 0 chimeras00:00 47Mb    100.0% 20 OTUs, 2 chimeras
+
+
+
+OTU tab
+=======
++ [[ usearch == \v\s\e\a\r\c\h ]]
++ [[ usearch == \u\s\e\a\r\c\h ]]
+++ mktemp workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.XXXXXX.fasta
++ uniques=workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.Gy2EHL.fasta
++ zstd -dqf workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.fasta.zst -o workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.Gy2EHL.fasta
++ usearch -otutab workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.Gy2EHL.fasta -otus results/ITS3-KYO2...ITS4/uparse.fasta -id 0.97 -maxaccepts 8 -maxrejects 8 -otutabout results/ITS3-KYO2...ITS4/uparse_otutab.txt -biomout results/ITS3-KYO2...ITS4/uparse.biom -notmatched workdir/cluster/4_otutab/ITS3-KYO2...ITS4/uparse_otutab_notmatched.fasta -threads 1
+usearch v11.0.667_i86linux32, 4.0Gb RAM (32.1Gb total), 16 cores
+(C) Copyright 2013-18 Robert C. Edgar, all rights reserved.
+https://drive5.com/usearch
+
+License: <email removed>
+
+00:00 37Mb      0.1% Reading results/ITS3-KYO2...ITS4/uparse.fasta00:00 41Mb    100.0% Reading results/ITS3-KYO2...ITS4/uparse.fasta
+00:00 7.1Mb     0.1% Masking (fastnucleo)                         00:00 7.1Mb   100.0% Masking (fastnucleo)
+00:00 7.9Mb     0.1% Word stats          00:00 8.0Mb   100.0% Word stats
+00:00 8.0Mb   100.0% Alloc rows
+00:00 8.0Mb     0.1% Build index00:00 8.0Mb   100.0% Build index
+00:00 41Mb      0.1% Searching all_uniques.Gy2EHL.fasta, 0.0% matched00:01 43Mb     12.2% Searching all_uniques.Gy2EHL.fasta, 98.6% matched00:02 43Mb     26.7% Searching all_uniques.Gy2EHL.fasta, 96.3% matched00:03 43Mb     39.9% Searching all_uniques.Gy2EHL.fasta, 95.9% matched00:04 43Mb     52.2% Searching all_uniques.Gy2EHL.fasta, 96.0% matched00:05 43Mb     68.2% Searching all_uniques.Gy2EHL.fasta, 96.6% matched00:06 43Mb     84.2% Searching all_uniques.Gy2EHL.fasta, 95.8% matched00:06 43Mb    100.0% Searching all_uniques.Gy2EHL.fasta, 95.6% matched
+90133 / 91478 mapped to OTUs (98.5%)                                  
+00:06 43Mb   Writing results/ITS3-KYO2...ITS4/uparse_otutab.txt
+00:06 43Mb   Writing results/ITS3-KYO2...ITS4/uparse_otutab.txt ...done.
+00:06 43Mb   Writing results/ITS3-KYO2...ITS4/uparse.biom
+00:06 43Mb   Writing results/ITS3-KYO2...ITS4/uparse.biom ...done.
++ rm workdir/cluster/2_unique_all/ITS3-KYO2...ITS4/all_uniques.Gy2EHL.fasta
++ gzip -n results/ITS3-KYO2...ITS4/uparse_otutab.txt
++ zstd --rm -qf workdir/cluster/4_otutab/ITS3-KYO2...ITS4/uparse_otutab_notmatched.fasta
++ '[' false = true ']'

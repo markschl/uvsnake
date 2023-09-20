@@ -1,0 +1,3 @@
+sample	raw	merged	percent-merged	fwd-primer	fwd-percent-of-merged	rev-primer	rev-percent-of-merged	long-enough	long-percent-of-merged	ITS3-KYO2...ITS4	filtered	filtered-percent-of-trimmed
+mock1	41761	41256	98.79	40182	97.4	40614	98.44	40534	98.25	39568	23822	60.21
+mock2	53711	53140	98.94	52670	99.12	52371	98.55	53083	99.89	51910	31845	61.35

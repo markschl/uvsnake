@@ -1,1 +1,9 @@
 simple/
+fastq/
+
+!logs/
+logs/*
+!logs/*_all.log
+
+*_sintax.txt.gz
+*_sintax.fasta.gz

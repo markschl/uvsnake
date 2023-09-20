@@ -1,63 +1,57 @@
 # Test data
 
-The directory `test/fastq` contains example files from an Illumina NextSeq run of two uneven (staggered) mock communities (Schlegel et al. 2018).
-
-A random subset was taken from two published read files:
+These commands download example sequencing data (Illumina NextSeq) from two uneven (staggered) mock communities (Schlegel et al. 2018) into the `test/fastq` directory.
 
 ```sh
-# number of sequences to keep from each sample
-sample_size=10000
-# random seed to ensure reproducibility of sample
-random_seed=20386
-# sample accessions
-declare -A accessions
-accessions[mock1]=SRR25280624
-accessions[mock2]=SRR25280620
+# define sample URLs
+declare -A urls
+urls[mock1]=https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR252/024/SRR25280624/SRR25280624
+urls[mock2]=https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR252/020/SRR25280620/SRR25280620
 
-cd test
 # download
-for sample in ${!accessions[@]}; do
-  acc=${accessions[$sample]}
-  echo "$acc > $sample"
-  fasterq-dump --split-files -O fastq $acc
-  # take a random subset using a fixed seed (for reproducibility)
-  # Used seqtool v0.3.0 (https://github.com/markschl/seqtool)
-  st sample -n $sample_size -s $random_seed fastq/"$acc"_1.fastq | 
-    gzip -c > fastq/"$sample"_R1.fastq.gz
-  st sample -n $sample_size -s $random_seed fastq/"$acc"_2.fastq |
-    gzip -c > fastq/"$sample"_R2.fastq.gz
-  rm fastq/*.fastq
+mkdir -p test/fastq
+for sample in ${!urls[@]}; do
+  url_prefix=${urls[$sample]}
+  echo "$url_prefix > $sample"
+  wget -O test/fastq/"$sample"_R1.fastq.gz "$url_prefix"_1.fastq.gz
+  wget -O test/fastq/"$sample"_R2.fastq.gz "$url_prefix"_2.fastq.gz
 done
 ```
 
 ## Download taxonomy database
 
-For taxonomic assignments, we can download the UNITE database. Here, we use the Eukaryota dataset, which is more strictly filtered (doesn't contain all singletons) (https://doi.org/10.15156/BIO/2483917):
+For taxonomic assignments (`sintax` command, see next chapter), we download all Eukaryota ITS reference sequences the UNITE database. Here, we use the more strictly filtered dataset (doesn't contain all singletons) (https://doi.org/10.15156/BIO/2938081):
 
 ```sh
-cd test
-
-url=https://files.plutof.ut.ee/public/orig/8F/FC/8FFCC8A730E50FEEF8CFFEEFEF02A22FBCF7E02B7FD31C6649754834D2CB0E6F.tgz
+url=https://files.plutof.ut.ee/public/orig/1C/C2/1CC2477429B3A703CC1C7A896A7EFF457BB0D471877CB8D18074959DBB630D10.tgz
 wget --no-check-certificate -O unite.tar.gz $url
 mkdir -p unite
 tar -C unite -xzf unite.tar.gz
 
-# We clean the taxonomy a bit, converting undefined names to 'rank__' with an
-# empty name. When importing, the pipeline will simply remove those empty ranks, as
-# the SINTAX does not need these names.
-cat unite/*_dynamic_*.txt |
+# we use the clusters with a dynamic threshold
+fasta=unite/*_dynamic_*.fasta
+taxonomy=unite/*_dynamic_*.txt
+
+# We clean the taxonomy, converting undefined names to 'rank__' with an
+# empty name. The pipeline will then drop those empty ranks, as SINTAX does
+# not need all ranks to be defined.
+# Also, we remove the 'sh' (species hypothesis) rank, because it is not needed
+# (only one sequence per SH) and because the two-letter 'sh' code causes problems
+# with USEARCH
+cat $taxonomy |
   sed -E 's/([a-z])__[^;]+?_Incertae_sedis;/\1__;/g' |  # clean intermediate ranks
-  sed -E 's/s__.+?_sp$/s__/g' `# clean undefined species names` \
+  sed -E 's/s__.+?_sp;sh__/s__;sh__/g' | # clean undefined species names
+  sed -E 's/;sh__.*//g' `# remove 'sh' rank` \
   > unite/tax.txt
 
 # Subsequently, we use https://github.com/markschl/seqtool to add the taxonomy to the
 # FASTA headers.
-# Also, we remove poorly annotated sequences, which have no known
-# order name.
+# Also, in this case we remove (potentially) poorly annotated sequences,
+# which have no known order name
 # In this example, 177138 of 234479 sequences are retained
-st set -d '{l:2}' -ul unite/tax.txt unite/*_dynamic_*.fasta |  # combine
-  st find --exclude --desc ';o__;f__;g__;s__' |
-  gzip -c > unite_refs.fasta.gz
+st set -d '{l:2}' -ul unite/tax.txt $fasta |
+  st find --exclude --desc --regex ';o__;f__;g__;s__$' |
+  gzip -c > test/unite_refs.fasta.gz
 
 # clean up
 rm -R unite unite.tar.gz
@@ -65,37 +59,42 @@ rm -R unite unite.tar.gz
 
 ## Running the denoising/clustering pipeline
 
-These commands run all the clustering workflows (on a local computer) and compare the results. This needs to be done in the 'uvsnake' directory, so if you ran the setup code above, make sure to `cd ..`.
+These commands run all the clustering workflows (on a local computer) and visualize the results (see `test/R_example/example.Rmd`). This needs to be done in the 'uvsnake' directory.
+
+Note that by default, `uvsnake` only uses one processor (no parallel processing). In our case this is intended, since the analysis outcome is always the same, except for SINTAX, which does random bootstrapping. To use multiple processors, specify their number with the `-c/--cores` argument. 
+
 
 ```sh
 conda activate snakemake
 
-# Run the UNOISE3 and UPARSE pipelines.
-# To make sure that the order of ASVs does not change between runs,
-# we use only one core (-c1).
+# Run the UNOISE3 and UPARSE pipelines
+# (using VSEARCH, as configured in test/config/config.yaml)
 ./uvsnake test unoise3 uparse
 
-# (optional) remove working directories
-./uvsnake test clean
-
 # Now, we can assign the taxonomy using the 'sintax' rule
+# using the previously assembled database
 ./uvsnake test sintax
 
 # We may also compare the results with the expected sequences using
 # VSEARCH -usearch_global
 # This allows us to match the known isolates with the observed OTUs
 out=test/results/ITS3-KYO2...ITS4
-vsearch -usearch_global $out/unoise3.fasta -db test/mock/mock_ITS2.fasta \
-    -userout $out/mock_cmp.txt \
-    -userfields 'query+target+id' \
-    -id 0.97
+vsearch --usearch_global $out/unoise3.fasta \
+  --db test/mock/mock_ITS2.fasta \
+  --userout $out/mock_cmp.txt \
+  --userfields 'query+target+id' \
+  --id 0.97 \
+  --threads 1
 
 ## render the example Rmd (requires pandoc in PATH or RSTUDIO_PANDOC set, here for Ubuntu)
 # If this doesn't work, you can still directly run the document in RStudio
 export RSTUDIO_PANDOC=/usr/lib/rstudio/resources/app/bin/quarto/bin/tools
 Rscript -e "rmarkdown::render('test/R_example/example.Rmd', 'github_document')"
 
-# the following command removes everything (INCLUDING the results/ directory)
+# (optional) remove working directory and logs
+./uvsnake test clean
+
+# the following command removes everything (INCLUDING the results directory)
 ./uvsnake test clean_all
 ```
 

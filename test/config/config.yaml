@@ -1,6 +1,7 @@
-# (this is actually optional, just shows the defaults)
 defaults:
-  program: vsearch
+  # use USEARCH for all steps (VSEARCH would be used otherwise)
+  program: usearch
+  # (maxaccepts/maxrejects are optional, these are the defaults anyway)
   maxaccepts: 1
   maxrejects: 1
 
@@ -45,14 +46,19 @@ uparse:
 
 # (optional, only needed if 'unoise3' rule is run)
 unoise3:
-  min_size: 8
+  # note: the USEARCH default is 8, but we have only two samples here, and
+  # rare species are missed with minsize=8.
+  # Going even lower is problematic: minsize=2 will yield two OTUs for one of the species,
+  # while minsize=1 creates a lot of artifact OTUs and should never be used.
+  min_size: 3
 
 otutab:
   ident_threshold: 97
-  maxaccepts: 32
-  maxrejects: 32
+  # higher values -> slower, but more precise OTU table
+  maxaccepts: 8
+  maxrejects: 8
 
 sintax:
   db: unite_refs.fasta.gz
   db_format: qiime
-  confidence: 0.8
+  confidence: 0.7

@@ -1,0 +1,111 @@
+---
+output:
+  github_document:
+    df_print: kable
+  pdf_document: default
+  word_document: default
+  html_document: default
+---
+
+# Mock community analysis
+
+```{r setup, warning=F, message=F}
+library(phyloseq)
+library(tidyverse)
+library(ggplot2)
+theme_set(theme_bw())
+options(knitr.kable.NA = "")
+```
+
+## Read data
+
+We read the BIOM file containing the OTU table from the UNOISE3 clustering, as well as the SINTAX taxonomic assignments into a Phyloseq object:
+
+```{r}
+res_dir <- "../results/ITS3-KYO2...ITS4"
+physeq <- import_biom(file.path(res_dir, "unoise3_sintax.biom.gz"))
+colnames(tax_table(physeq)) <- c("kingdom", "phylum", "class", "order", "family", "genus", "species")
+physeq
+```
+
+In order to get the species names and mixed relative concentrations for the 24 isolates, we read the metadata and the OTU -> isolate mapping (done with VSEARCH after running the pipeline).
+
+```{r}
+meta = read_tsv("../mock/mock_data.txt")
+
+otu_map = read_tsv(file.path(res_dir, "mock_cmp.txt"),
+                   col_names=c("OTU", "isolate", "ident"))
+
+meta = meta %>% 
+  select(isolate=name, mock1_rel=rel_abund_m1, mock2_rel=rel_abund_m2) %>% 
+  left_join(otu_map, "isolate")
+
+meta
+```
+
+From the 24 isolates, `r with(meta, length(unique(isolate[!is.na(OTU)])))` were matched by at least one OTU. The remaining ones had a very low relative concentration in the mix and were thus not detected at the given sequencing depth. In theory, it would be possible to find more OTUs by lowering the value of `minsize` from the current value of `3`, at the expense of obtaining artefact OTUs.The sequence similarity (`ident`) was always 100%, which is optimal.
+
+## Taxonomy
+
+Part of the isolates were assigned at the genus and species levels at a bootstrap threshold of 0.7, and those names are correct in most cases.
+
+```{r}
+otus <- as(tax_table(physeq), "matrix")
+data.frame(reads=taxa_sums(physeq), otus) %>% 
+  rownames_to_column('OTU') %>% 
+  arrange(-reads) %>% 
+  select(OTU, reads, phylum, genus, species) %>% 
+  left_join(meta %>% select(OTU, isolate), 'OTU')
+```
+
+## Mixed vs. amplified frequencies
+
+We compare the relative mixed genomic DNA from the different isolates with their read counts in the sequenced mock communities:
+
+```{r}
+counts <- otu_table(physeq) %>%
+  as.data.frame() %>%
+  rownames_to_column("OTU")
+
+mock1 = meta %>% 
+  select(isolate, OTU, rel_conc=mock1_rel) %>% 
+  left_join(counts %>% select(OTU, reads=mock1), "OTU") %>% 
+  mutate(community = "mock1")
+mock2 = meta %>% 
+  select(isolate, OTU, rel_conc=mock2_rel) %>% 
+  left_join(counts %>% select(OTU, reads=mock2), "OTU") %>% 
+  mutate(community = "mock2")
+
+# then sum up the OTU counts per isolate
+mock_data = bind_rows(mock1, mock2) %>% 
+  group_by(community, isolate, rel_conc) %>%
+  summarise(
+    reads = sum(reads, na.rm=T),
+    reads = ifelse(is.na(reads), 0, reads),
+    OTUs = paste(unique(na.omit(OTU)), collapse = ","),
+    n_otus = n(),
+    .groups = "drop"
+  ) %>%
+  arrange(community, -rel_conc)
+
+head(mock_data)
+```
+
+The *mock2* community is more uneven, concentrations decrease faster than in mock1, which is also the reason that less OTUs were found in that community.
+
+```{r fig.width=6.4, fig.height=2.7, message=F, warning=F}
+ggplot(mock_data, aes(rel_conc, reads)) +
+  geom_point(aes(size = as.factor(n_otus)), pch = 21, alpha = 0.7) +
+  geom_smooth(method = "lm", formula = "y~x", se = F, size = 0.3) +
+  facet_grid(~ community) +
+  scale_size_discrete(range = c(1, 4)) +
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(
+    x = "Mixed relative concentration",
+    y = "Read count",
+    size = "Number\nof OTUs"
+  ) +
+  theme_bw() +
+  theme(strip.text.y = element_text(angle = 0))
+```

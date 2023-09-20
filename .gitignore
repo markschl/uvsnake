@@ -1,10 +1,12 @@
 workdir/
 logs/
+benchmarks/
 *~
 _*/
 .snakemake*
 multiqc*
 unite_*.fasta.gz
+*.svg
 *.html
 .tests/
 *.pyc

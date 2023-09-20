@@ -1,0 +1,36 @@
+defaults:
+  maxaccepts: 1
+  maxrejects: 1
+  program: usearch
+filter:
+  max_error_rate: 0.002
+input:
+  sample_file: config/samples.tsv
+merge:
+  max_diffs: 1000
+  overlap_ident: 75
+otutab:
+  extra: false
+  ident_threshold: 97
+  maxaccepts: 8
+  maxrejects: 8
+primers:
+  forward:
+  - ITS3-KYO2: GATGAAGAACGYAGYRAA, GATGAAGRACGCMGCGAA, GATGACGAACGCAGCGAA, GATGAAGAACACAGYGAA,
+      GATGAAGAGCGYAGCRAA, GATGAAGAACGCGGCGAA, TCGATGAAGAMCGTWGC
+  reverse:
+  - ITS4: TCCTCCGCTTATTGATATGC, TCCTCCGCTTATTAATATGC, TCCTCCGCTTAVTGATATGC, TCCTCCACTTATTGATATGC,
+      TCCTCTGCTTATTGATATGC, TCCTGCGCTTATTGATATGC, TCCTCCGCTGAWTAATATGC, TCCTCGCCTTATTGATATGC
+  trim_settings:
+    max_error_rate: 0.1
+    min_length: 100
+    min_overlap: 15
+sintax:
+  confidence: 0.7
+  db: unite_refs.fasta.gz
+  db_format: qiime
+unoise3:
+  min_size: 3
+uparse:
+  min_size: 2
+usearch_binary: usearch
