@@ -41,8 +41,6 @@ rule collect_derep:
         all="workdir/cluster/2_unique_all/{primers}/all_uniques.fasta.zst",
     log:
         "logs/cluster/2_unique_all/{primers}.log",
-    group:
-        "denoise"
     conda:
         "envs/basic.yaml"
     resources:
