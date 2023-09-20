@@ -72,6 +72,7 @@ for f in "$@"; do
         -g "$f_primer" \
         --error-rate $primers_trim_settings_max_error_rate \
         --overlap $primers_trim_settings_min_overlap \
+        --no-indels \
         --cores $THREADS \
         --discard-untrimmed \
         -o "$outdir"/$s.trimmed_fwd.fastq
@@ -80,6 +81,7 @@ for f in "$@"; do
         -a "$r_primer" \
         --error-rate $primers_trim_settings_max_error_rate \
         --overlap $primers_trim_settings_min_overlap \
+        --no-indels \
         --minimum-length $primers_trim_settings_min_length \
         --cores $THREADS \
         --discard-untrimmed \

@@ -24,7 +24,7 @@ mkdir -p $out/fq
 for f in $fq/*.fastq.gz; do
   zcat $f > $out/fq/$(basename ${f%.gz})
 done
-# primers
+# primer mixes that were used for the specific mock communities in the test dataset
 fprimers=$out/fprimers.fa
 echo -n > $fprimers
 for seq in GATGAAGAACGYAGYRAA GATGAAGRACGCMGCGAA GATGACGAACGCAGCGAA GATGAAGAACACAGYGAA GATGAAGAGCGYAGCRAA GATGAAGAACGCGGCGAA TCGATGAAGAMCGTWGC; do
@@ -39,7 +39,7 @@ done
 # run the pipeline once using VSEARCH
 conda activate snakemake
 ./uvsnake test clean_all
-./uvsnake test unoise3
+./uvsnake test unoise3 --config 'defaults={program: vsearch}'
 
 # Run "simple" VSEARCH analysis and compare results
 pout=test/results/ITS3-KYO2...ITS4
@@ -51,20 +51,20 @@ if ! cmp -s $vout/unoise3.fasta $pout/unoise3.fasta; then
   exit 1
 fi
 if ! cmp -s $vout/unoise3_otutab.txt.gz $pout/unoise3_otutab.txt.gz; then
-  echo "VSEARCH zOTUs differ ($vres/unoise3_otutab.txt.gz $pout/unoise3_otutab.txt.gz)" >&2
+  echo "VSEARCH zOTUs differ ($vout/unoise3_otutab.txt.gz $pout/unoise3_otutab.txt.gz)" >&2
   exit 1
 fi
 echo "VSEARCH 'simple' pipeline does not differ from UVSnake"
 
-# for comparing biom with Meld:
-# meld <(python -m json.tool $vout/unoise3.biom) <(python -m json.tool $pout/unoise3.biom)
+# for comparing biom with Meld/json.tool:
+# meld <(python -m json.tool test/simple/vsearch/unoise3.biom) <(python -m json.tool test/results/ITS3-KYO2...ITS4/unoise3.biom)
 # ...or the whole directories
 # meld test/results/ITS3-KYO2...ITS4 test/simple/vsearch
 
 # Run USEARCH pipeline
 conda activate snakemake
 ./uvsnake test clean_all
-./uvsnake test unoise3 uparse --config 'defaults={program: usearch}'
+./uvsnake test unoise3 uparse
 
 # Run simple USEARCH analysis
 conda activate uvsearch
@@ -101,6 +101,6 @@ for what in unoise3 uparse; do
 done
 
 # for comparing biom with Meld:
-# meld <(python -m json.tool $uout/unoise3.biom) <(python -m json.tool $pout/unoise3.biom)
+# meld <(python -m json.tool test/simple/usearch/unoise3.biom) <(python -m json.tool test/results/ITS3-KYO2...ITS4/unoise3.biom)
 # ...or the whole directories
 # meld test/results/ITS3-KYO2...ITS4 test/simple/usearch

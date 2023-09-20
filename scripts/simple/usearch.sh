@@ -55,6 +55,7 @@ cutadapt "$outdir/raw.fq" \
     -g "$f_primer" \
     --error-rate $primers_trim_settings_max_error_rate \
     --overlap $primers_trim_settings_min_overlap \
+    --no-indels \
     --cores $threads \
     --discard-untrimmed \
     -o "$outdir/trimmed_fwd.fq"
@@ -64,6 +65,7 @@ cutadapt "$outdir/trimmed_fwd.fq" \
     --error-rate $primers_trim_settings_max_error_rate \
     --overlap $primers_trim_settings_min_overlap \
     --minimum-length $primers_trim_settings_min_length \
+    --no-indels \
     --cores $threads \
     --discard-untrimmed \
     -o "$outdir/trimmed.fq"
