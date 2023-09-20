@@ -159,6 +159,8 @@ rule cluster_uparse:
         runtime=uparse_timefunc(config["uparse"]["min_size"], with_default("maxaccepts", "uparse")),
     shell:
         """
+        exec &> {log[0]}
+        set -xeuo pipefail
         zstd -dcq {input} > {output.tmp_in}
         "{params.usearch_bin}" \
             -cluster_otus {output.tmp_in} \
@@ -166,7 +168,7 @@ rule cluster_uparse:
             -relabel Otu \
             -maxaccepts {params.maxaccepts} \
             -maxrejects {params.maxrejects} \
-            -minsize {params.min_size} &> {log}
+            -minsize {params.min_size}
         """
 
 
