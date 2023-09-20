@@ -48,7 +48,7 @@ cat $taxonomy |
 # FASTA headers.
 # Also, in this case we remove (potentially) poorly annotated sequences,
 # which have no known order name
-# In this example, 177138 of 234479 sequences are retained
+# In this example, 178141 of 234479 sequences are retained
 st set -d '{l:2}' -ul unite/tax.txt $fasta |
   st find --exclude --desc --regex ';o__;f__;g__;s__$' |
   gzip -c > test/unite_refs.fasta.gz
@@ -59,7 +59,7 @@ rm -R unite unite.tar.gz
 
 ## Running the denoising/clustering pipeline
 
-These commands run all the clustering workflows (on a local computer) and visualize the results (see `test/R_example/example.Rmd`). This needs to be done in the 'uvsnake' directory.
+These commands run all the clustering workflows (on a local computer) and visualize the results (see `test/R_example/example.Rmd` and the [analysis output](R_example/example.md)). This needs to be done in the 'uvsnake' directory.
 
 Note that by default, `uvsnake` only uses one processor (no parallel processing). In our case this is intended, since the analysis outcome is always the same, except for SINTAX, which does random bootstrapping. To use multiple processors, specify their number with the `-c/--cores` argument. 
 
@@ -98,7 +98,7 @@ Rscript -e "rmarkdown::render('test/R_example/example.Rmd', 'github_document')"
 ./uvsnake test clean_all
 ```
 
-This figure from the `R_example` analysis shows that the mixed relative genomic DNA concentration of the isolates corresponds well to the relative read abundance in the samples.
+This figure from the [`R_example`](R_example/example.md) analysis shows that the mixed relative genomic DNA concentration of the isolates corresponds well to the relative read abundance in the samples.
 
 ![mock comparison](R_example/example_files/figure-gfm/unnamed-chunk-5-1.png)
 
