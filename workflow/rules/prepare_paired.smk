@@ -34,20 +34,6 @@ rule merge_paired:
         "scripts/merge_paired.sh"
 
 
-rule make_primer_fasta:
-    input:
-        yaml="workdir/primers/primers.yaml",
-    output:
-        forward="workdir/primers/forward.fasta",
-        reverse_rev="workdir/primers/reverse_rev.fasta",
-    log:
-        "logs/make_primer_fasta.log",
-    conda:
-        "envs/basic.yaml"
-    script:
-        "../scripts/make_primer_fasta.py"
-
-
 rule trim_primers_paired:
     params:
         max_error_rate=config["primers"]["trim_settings"]["max_error_rate"],

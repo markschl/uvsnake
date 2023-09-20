@@ -1,7 +1,7 @@
 
 localrules:
     dump_config,
-    make_cutadapt_fasta,
+    make_primer_fasta,
 
 
 rule dump_config:
@@ -17,7 +17,7 @@ rule dump_config:
         "scripts/dump_config.py"
 
 
-rule make_cutadapt_fasta:
+rule make_primer_fasta:
     params:
         primer_config=config["_primers"],
     output:
