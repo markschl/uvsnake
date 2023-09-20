@@ -44,8 +44,8 @@ rule assign_taxonomy_sintax:
         if with_default("program", "sintax") == "vsearch" \
         else 1
     resources:
-        mem_mb=mem_func(5000),
-        runtime=time_func(120),
+        mem_mb=5000,
+        runtime=240,
     script:
         "scripts/taxonomy_sintax.sh"
 
