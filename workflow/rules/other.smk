@@ -41,6 +41,8 @@ rule combine_logs:
                              primers=config["_primer_combinations"]),
         cluster=expand("logs/cluster/3_cluster/{primers}_{{method}}.log",
                        primers=config["_primer_combinations"]),
+        otutab=expand("logs/cluster/4_otutab/{primers}_{{method}}.log",
+                       primers=config["_primer_combinations"]),
     output:
         "logs/cluster_{method}_all.log",
     shell:
@@ -65,4 +67,8 @@ rule combine_logs:
         echo "Cluster"
         echo "======="
         cat {input.cluster:q}
+        printf "\n\n\n"
+        echo "OTU tab"
+        echo "======="
+        cat {input.otutab:q}
         """
