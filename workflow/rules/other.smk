@@ -56,6 +56,8 @@ rule combine_logs:
         "logs/cluster_{method}_all.log",
     log:
         "logs/combine_logs_{method}.log",
+    conda:
+        "envs/uvsnake.yaml"
     shell:
         """
         exec 2> "{log}"

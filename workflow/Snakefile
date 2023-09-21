@@ -4,11 +4,15 @@ from snakemake.utils import min_version, validate
 # https://github.com/snakemake/snakemake/blob/main/CHANGELOG.md
 min_version("7.14.0")
 
+
 configfile: "config/config.yaml"
+
 
 validate(config, "config.schema.yaml")
 
+
 report: "report/workflow.rst"
+
 
 include: "rules/common.smk"
 include: "rules/clean.smk"

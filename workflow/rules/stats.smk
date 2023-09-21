@@ -21,7 +21,7 @@ rule stats:
         ),
     output:
         tsv="results/sample_report.tsv",
-        report=report("report/stats.txt", category="Sample report")
+        report=report("report/stats.txt", category="Sample report"),
     log:
         "logs/sample_report.log",
     conda:

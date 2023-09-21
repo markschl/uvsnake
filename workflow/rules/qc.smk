@@ -80,5 +80,7 @@ rule multiqc_all:
 rule clean_qc:
     log:
         "logs/clean_qc.log",
+    conda:
+        "envs/uvsnake.yaml"
     shell:
         "rm -Rf qc 2> {log}"
