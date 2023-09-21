@@ -157,8 +157,8 @@ rule usearch_make_otutab:
         maxrejects=with_default("maxrejects", "otutab"),
         # optional diagnostic output
         extra="true" if config["otutab"].get("extra", False) else "false",
-        bam_out="workdir/otutab_mapping/{primers}/{what}.bam",
-        map_out="workdir/otutab_mapping/{primers}/{what}_search.txt.gz",
+        bam_out="workdir/cluster/4_otutab/{primers}/{what}.bam",
+        map_out="workdir/cluster/4_otutab/{primers}/{what}_search.txt.gz",
     input:
         otus="results/{primers}/{what}.fasta",
         uniques="workdir/cluster/2_unique_all/{primers}/all_uniques.fasta.zst",
