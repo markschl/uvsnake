@@ -5,13 +5,6 @@ import os
 import sys
 import multiprocessing
 
-# try:
-#     from yaml import safe_load
-# except ImportError:
-#     print("The 'pyyaml' package is missing. Simplest is to install it "
-#           "e.g. with this command: 'pip3 install --user pyyaml'", file=sys.stderr)
-#     exit(1)
-
 try:
     import snakemake
 except ImportError:
@@ -24,19 +17,6 @@ def main(argv = sys.argv[1:]):
 
     p = argparse.ArgumentParser(
         description="USEARCH/VSEARCH-based amplicon pipeline")
-    
-    p.add_argument(
-        "directory",
-        help="""
-        Working directory where the configuration is found ('config'
-        directory) and all output is placed.
-        """)
-    p.add_argument(
-        "target",
-        nargs="*",
-        help="""
-        Targets to build (rules or files).
-        """)
 
     d = p.add_argument_group("Data storage (common for all datasets)")
     d.add_argument(
@@ -56,20 +36,12 @@ def main(argv = sys.argv[1:]):
         """)
     r.add_argument(
         "-j", "--jobs",
-        default="1",
         help="""
         Number of jobs to submit or 'unlimited'. This is only relevant in cluster/cloud mode.
         The default is 1, so make sure to change this in order to run jobs
         simultanesously on multiple nodes.
         """)
-    r.add_argument(
-        "--local-cores", type=int,
-        default=1,
-        help="""
-        Number of cores to use for very short computations on the host machine.
-        This is not relevant on a normal PC.
-        """)
-    
+
     dev = p.add_argument_group("Other")
     dev.add_argument(
         "--dev", action="store_true",
@@ -82,41 +54,36 @@ def main(argv = sys.argv[1:]):
 
     args, other_args = p.parse_known_args(argv)
     
-    # determine resources
+    # attempt to set group sizes
     # TODO: cores on entry node may be different...
     n_cores = multiprocessing.cpu_count() if args.cores == 'all' else int(args.cores)
 
-    # # Obtain number of samples
-    # with open(os.path.join(args.directory, "config", "config.yaml")) as f:
-    #     cfg = safe_load(f)
-    #     with open(os.path.join(args.directory, cfg["input"]["sample_file"])) as f:
-    #         nsamples = max(0, sum(1 for line in f if line.strip(" \r\n")) - 1)
-
     # calculate group size
     sample_group_size = 3
-    if args.jobs != "unlimited":
+    if args.jobs != "unlimited" and args.jobs is not None:
         sample_group_size = max(sample_group_size, round(int(args.jobs) / n_cores))
 
-    # basic command
-    cmd = [
-        "-d", args.directory,
-        "-c", args.cores,
-        "-j", args.jobs,
-        "--local-cores", str(args.local_cores),
-        "--group-components", f"sample={sample_group_size}",
+    # assemble CLI arguments
+    cmd = []
+    if args.jobs is not None:
+        cmd += ["--jobs", args.jobs]
+    cmd += [
+        "--cores", args.cores,
         "--use-conda", "--conda-prefix", args.conda_dir,
-        "--rerun-incomplete",
+        "--group-components", f"sample={sample_group_size}",
         # here set default resources for rules from 'sample' group, since
-        # these currently don't accept functions
+        # resources in grouped rules currently don't accept functions
         # (https://github.com/snakemake/snakemake/issues/2154#issuecomment-1553538507)
         "--default-resources",
-        "mem_mb=500*2**(attempt-1)"
+        "mem_mb=500*2**(attempt-1)",
+        "--rerun-incomplete"
     ]
 
-    cmd = args.target + cmd + other_args
     if args.dev:
-        cmd += ["--rerun-triggers", "mtime", "params", "input", "software-env"]
-        
+        cmd = ["--rerun-triggers", "mtime", "params", "input", "software-env"] + cmd
+    
+    cmd = cmd + other_args
+
     # Finally, we can run Snakemake
     print("Running: snakemake " + " ".join(cmd), file=sys.stderr)
     snakemake.main(cmd)

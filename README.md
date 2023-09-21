@@ -2,7 +2,6 @@
 
 This [Snakemake](https://snakemake.github.io) workflow aims at providing a simple way for clustering/denoising paired-end Illumina sequences with [USEARCH](https://drive5.com/usearch) and/or [VSEARCH](https://github.com/torognes/vsearch).
 
-
 ## Features
 
 * *Standard pipeline*: Paired-end read merging, primer trimming, UNOISE3/UPARSE clustering and SINTAX taxonomy assignment
@@ -13,66 +12,95 @@ This [Snakemake](https://snakemake.github.io) workflow aims at providing a simpl
 
 ## Workflow
 
-The workflow follows the [recommendations](https://drive5.com/usearch/manual/uparse_pipeline.html) by the author of USEARCH, but with the addition of trimming primers with Cutadatapt and adding some QC
+The workflow follows the [recommendations](https://drive5.com/usearch/manual/uparse_pipeline.html) by the author of USEARCH, but with the addition of trimming primers with Cutadapt and adding some QC. The result will be similar if VSEARCH or USEARCH are used for different steps, even though small differences are to be expected. The UPARSE algorithm is not available in VSEARCH.
 
 ![workflow](docs/workflow.png)
-
 
 ## Installation (UNIX)
 
 Download the [latest release](https://github.com/markschl/uvsnake/releases/latest) and unpack it to some directory. In a terminal, change into the directory (`cd directory`). Also make sure to install [Snakemake](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html) (along with the Conda package manager).
 
-The pipeline is configured to use VSEARCH for all steps, but in case of using USEARCH (`program: usearch`), first obtain the software [here](https://www.drive5.com/usearch/download.html), and make sure that it is installed as `usearch` in `$PATH`. Alternatively, specify the path to USEARCH in the *usearch_binary* section of [`config.yaml`](config/config.template.yaml).
+The following standard approach assumes [Mamba](https://github.com/mamba-org/mamba) to be installed as the Conda package manager:
 
+```sh
+# install Snakemake
+mamba create -c conda-forge -c bioconda --name snakemake snakemake snakedeploy
+conda activate snakemake
 
-## Input files
+# initialize project working directory
+mkdir -p path/to/project_dir
+cd path/to/project_dir
 
-The following illustration shows an overview of the input files, commands and output files:
+snakedeploy deploy-workflow https://github.com/markschl/uvsnake . --branch main
+```
 
-![input](docs/input.png)
+## Configuration
 
-More details on all available options in `config.yaml` are also available as comments in the template file [config/config.yaml](config/config.template.yaml).
+After initialization, a `config` directory is found in the project directory. It contains `config.yaml` and `samples.tsv`, which both have to be adjusted to your needs (see illustration). More details on the configuration and how to easily create a sample file [are found here](config):
+
+![input](docs/config.png)
 
 
 ## Running
 
-To run FastQC/MultiQC, UNOISE3 and UPARSE (assuming `config/config.yaml` to be in `analysis_dir`).
-
 ```sh
-conda activate snakemake
-./uvsnake analysis_dir quality unoise3 uparse
+conda activate snakemake  # if not already activated
+cores=10
 ```
 
-The equivalent (a bit more complicated) Snakemake command would be:
+To run FastQC/MultiQC (results in the `qc` directory):
 
 ```sh
-snakemake -d analysis_dir -c1 --conda --conda-prefix ~/uvsnake/conda quality unoise3 uparse
+snakemake --use-conda --cores $cores quality
 ```
 
-Apart from setting a few defaults (not all shown here), `uvsnake` can be used like `snakemake`, any number of Snakemake arguments can be added. The full command is always printed when executing. For instance, the script also assists with setting resource constraints on computer clusters and grouping small sample processing jobs into batches.
+To run UNOISE3 and UPARSE (output in `results/<fwd-primer>...<reverse-primer>/` directory):
+
+```sh
+snakemake --use-conda --cores $cores unoise3 uparse
+```
 
 ![results](docs/results.png)
 
 Assign taxonomy with SINTAX:
 
 ```sh
-./uvsnake analysis_dir sintax
+snakemake sintax
 ```
 
 ![results](docs/taxonomy.png)
 
-### Notes on taxonomy
+**Note**: The *taxonomy* rule should not be run together with the *unoise3* and/or *uparse* rules, but in a separate command *afterwards*. Taxonomic assignments are only done for clusters that are already present. If run before clustering, nothing happens.
 
-The *taxonomy* rule should not be run together with the *unoise3* and/or *uparse* rules, but in a separate command *afterwards*. Taxonomic assignments are only done for clusters that are already present. If run before clustering, nothing happens.
+## `uvsnake` script
+
+There is a simple script that runs Snakemake with a few default options (to save some typing), but otherwise behaves exactly like Snakemake. It becomes especially useful on clusters (see below).
+
+With the `snakedeploy` setup described above, we first need to download the script (UNIX):
+
+```sh
+wget https://raw.githubusercontent.com/markschl/uvsnake/main/uvsnake
+chmod +x uvsnake
+```
+
+The command looks similar to the `snakemake` command above:
+
+```sh
+./uvsnake --cores $cores unoise3 uparse
+```
+
+However, it adds a few additional arguments to the `snakemake` call (always printed when executing): `--rerun-incomplete --use-conda --conda-prefix  ~/uvsnake/conda`, and others. These make sure that Conda is always used, and the packages are installed at a common location `<user home>/uvsnake/conda`. 
 
 ### Cluster execution
 
-Executing on computer clusters requires [additional settings](https://snakemake.readthedocs.io/en/stable/executing/cluster.html). Uvsnake already takes care of setting resource constraints as well as possible, but it may make sense to allow restarting failed jobs with `-T/--retries`, in case they failed because of wrong time/memory constraints. Here an example running on a SLURM cluster with a total of three tries:
+Executing on computer clusters requires [additional settings](https://snakemake.readthedocs.io/en/stable/executing/cluster.html). Here, using the `uvsnake` script (previous chapter) is recommended, since it assists with setting resource constraints on computer clusters and grouping small sample processing jobs into batches. The latter is important because submitting every single sample processing step as job is very inefficient.
+
+It may also make sense to restart failed jobs with `-T/--retries`, in case they failed because of wrong time/memory constraints. Here an example running on a SLURM cluster with a total of three tries and a maximum of 100 parallel sample processing jobs:
 
 ```sh
-./uvsnake -T 3 --slurm analysis_dir quality unoise3 uparse
+./uvsnake --slurm --cores all --jobs 100 --retries 3 quality unoise3 uparse
 ```
 
 ## Example
 
-The [test](test) directory offers more details using an example dataset and shows how this pipeline is validated.
+The [test directory](test) contains an example dataset and shows how this pipeline is validated and how the data can be analyzed in R.
