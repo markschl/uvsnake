@@ -18,9 +18,7 @@ The workflow follows the [recommendations](https://drive5.com/usearch/manual/upa
 
 ## Installation (UNIX)
 
-Download the [latest release](https://github.com/markschl/uvsnake/releases/latest) and unpack it to some directory. In a terminal, change into the directory (`cd directory`). Also make sure to install [Snakemake](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html) (along with the Conda package manager).
-
-The following standard approach assumes [Mamba](https://github.com/mamba-org/mamba) to be installed as the Conda package manager:
+The following approach assumes [Mamba](https://github.com/mamba-org/mamba) to be installed as the Conda package manager:
 
 ```sh
 # install Snakemake
