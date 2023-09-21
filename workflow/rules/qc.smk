@@ -10,7 +10,7 @@ rule fastqc:
         expand(
             "qc/fastqc/{{sample}}/{{sample}}_R{read}_fastqc.{ext}",
             read=[1, 2] if config["_layout"] == "paired" else [1],
-            ext=("html", "zip")
+            ext=("html", "zip"),
         ),
     log:
         "logs/qc/fastqc/{sample}.log",
@@ -81,16 +81,16 @@ rule stats_paired:
     input:
         merge=expand(
             "workdir/prepare_paired/1_merge/{sample}/{sample}_stats.txt",
-            sample=config["_sample_names"]
+            sample=config["_sample_names"],
         ),
         trim=expand(
             "workdir/prepare_paired/2_trim/{sample}/{sample}_stats.txt",
-            sample=config["_sample_names"]
+            sample=config["_sample_names"],
         ),
         filter=expand(
             "workdir/cluster/1_filter_derep/{primers}/{sample}/{sample}_stats.txt",
             primers=config["_primer_combinations"],
-            sample=config["_sample_names"]
+            sample=config["_sample_names"],
         ),
     output:
         "results/sample_report.tsv",

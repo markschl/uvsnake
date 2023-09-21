@@ -1,7 +1,7 @@
 
 rule import_taxdb:
     params:
-        format=lambda _: config["sintax"]["db_format"]
+        format=lambda _: config["sintax"]["db_format"],
     input:
         db=lambda _: config["sintax"]["db"],
     output:
@@ -39,10 +39,7 @@ rule assign_taxonomy_sintax:
     # threads:
     # VSEARCH works in parallel (although cores seem to be used only ~50%) while
     # USEARCH v11 does not appear to use more than 1 thread
-    threads:
-        lambda _: workflow.cores \
-        if with_default("program", "sintax") == "vsearch" \
-        else 1
+    threads: lambda _: workflow.cores if with_default("program", "sintax") == "vsearch" else 1
     resources:
         mem_mb=5000,
         runtime=240,

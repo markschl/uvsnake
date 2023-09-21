@@ -1,14 +1,19 @@
-
-
 # filter and de-replicate (uses VSEARCH)
 rule filter_derep:
     params:
         maxee_rate=config["filter"]["max_error_rate"],
     input:
-        expand("workdir/prepare_{layout}/2_trim/{{sample}}/{{primers}}.fastq.zst", layout=config["_layout"]),
+        expand(
+            "workdir/prepare_{layout}/2_trim/{{sample}}/{{primers}}.fastq.zst",
+            layout=config["_layout"],
+        ),
     output:
-        filtered_tmp=temp("workdir/cluster/1_filter_derep/{primers}/{sample}/{sample}_filtered.fasta"),
-        discarded_tmp=temp("workdir/cluster/1_filter_derep/{primers}/{sample}/{sample}_discarded.fasta"),
+        filtered_tmp=temp(
+            "workdir/cluster/1_filter_derep/{primers}/{sample}/{sample}_filtered.fasta"
+        ),
+        discarded_tmp=temp(
+            "workdir/cluster/1_filter_derep/{primers}/{sample}/{sample}_discarded.fasta"
+        ),
         all="workdir/cluster/1_filter_derep/{primers}/{sample}/{sample}_all_uniques.fasta.zst",
         good="workdir/cluster/1_filter_derep/{primers}/{sample}/{sample}_good_uniques.fasta.zst",
         stats="workdir/cluster/1_filter_derep/{primers}/{sample}/{sample}_stats.txt",
@@ -20,7 +25,7 @@ rule filter_derep:
         "sample"
     resources:
         # mem_mb=mem_func(300), # very variable 10 - 230MB
-        runtime=30, #time_func(5, f=0.2),  # 0.004min/MiB  
+        runtime=30,  #time_func(5, f=0.2),  # 0.004min/MiB  
     script:
         "scripts/filter_derep.sh"
 
@@ -30,11 +35,11 @@ rule collect_derep:
     input:
         good=expand(
             "workdir/cluster/1_filter_derep/{{primers}}/{sample}/{sample}_good_uniques.fasta.zst",
-            sample=config["_sample_names"]
+            sample=config["_sample_names"],
         ),
         all=expand(
             "workdir/cluster/1_filter_derep/{{primers}}/{sample}/{sample}_all_uniques.fasta.zst",
-            sample=config["_sample_names"]
+            sample=config["_sample_names"],
         ),
     output:
         good="workdir/cluster/2_unique_all/{primers}/good_uniques.fasta.zst",
@@ -44,7 +49,7 @@ rule collect_derep:
     conda:
         "envs/uvsnake.yaml"
     resources:
-        mem_mb=mem_func(10, f=20), #  ~11MB per compressed input MB
+        mem_mb=mem_func(10, f=20),  #  ~11MB per compressed input MB
         runtime=time_func(5, f=0.08),  # 0.0014min/MiB  
     shell:
         """
@@ -74,40 +79,99 @@ rule collect_derep:
 
 
 # Memory and time constraints for HPC:
-# Approximation based on benchmarks and non-linear regression 
+# Approximation based on benchmarks and non-linear regression
 # (could always be inproved)
 # Some safety margin is added by multiplying the memory and time constraints with a factor
 # In addition, constraints are doubled at every attempt of re-running after a fail
 _mem_f = 2
 _time_f = 4
+
+
 def unoise3_memfunc(program, min_size, threads):
     if program == "usearch":
-        return lambda _, input, attempt: (_mem_f * (180*input.size_mb * min_size**-0.9 + 50)) * 2**(attempt-1)
-    return lambda _, input, attempt: (_mem_f * (90*input.size_mb * min_size**-1.4 * (threads-.46) + 50)) * 2**(attempt-1)
+        return lambda _, input, attempt: (
+            _mem_f * (180 * input.size_mb * min_size**-0.9 + 50)
+        ) * 2 ** (attempt - 1)
+    return lambda _, input, attempt: (
+        _mem_f * (90 * input.size_mb * min_size**-1.4 * (threads - 0.46) + 50)
+    ) * 2 ** (attempt - 1)
+
 
 def unoise3_timefunc(program, min_size, maxrejects, threads):
     if program == "usearch":
-        return lambda _, input, attempt: (_time_f * (30*input.size_mb**1.6 * min_size**-2+5)) * 2**(attempt-1)
-    return lambda _, input, attempt: (_time_f * (0.4*input.size_mb**1.52 * min_size**-2 * (threads**-.63-.58) * (maxrejects+4) + 5)) * 2**(attempt-1)
+        return lambda _, input, attempt: (
+            _time_f * (30 * input.size_mb**1.6 * min_size**-2 + 5)
+        ) * 2 ** (attempt - 1)
+    return lambda _, input, attempt: (
+        _time_f
+        * (
+            0.4
+            * input.size_mb**1.52
+            * min_size**-2
+            * (threads**-0.63 - 0.58)
+            * (maxrejects + 4)
+            + 5
+        )
+    ) * 2 ** (attempt - 1)
+
 
 def uparse_memfunc(min_size):
-    return lambda _, input, attempt: (_mem_f * (30*input.size_mb**0.5 * min_size**.2 + 50)) * 2**(attempt-1)
+    return lambda _, input, attempt: (
+        _mem_f * (30 * input.size_mb**0.5 * min_size**0.2 + 50)
+    ) * 2 ** (attempt - 1)
+
 
 def uparse_timefunc(min_size, maxaccepts):
-    return lambda _, input, attempt: (_time_f * (2*input.size_mb * min_size**-2 * maxaccepts**0.75 + 5)) * 2**(attempt-1)
+    return lambda _, input, attempt: (
+        _time_f * (2 * input.size_mb * min_size**-2 * maxaccepts**0.75 + 5)
+    ) * 2 ** (attempt - 1)
+
 
 from os.path import getsize
 from math import log
 
+
 def otutab_memfunc(program, threads):
     if program == "usearch":
-        return lambda _, input, attempt: (_mem_f * (4e-4 * (log(getsize(input.uniques))**8.3e-3-1) * (getsize(input.otus)+2e6) * (threads+5.1) + 50)) * 2**(attempt-1)
-    return lambda _, input, attempt: (_mem_f * (2e-5 * getsize(input.otus) * (threads-0.8) + 20)) * 2**(attempt-1)
+        return lambda _, input, attempt: (
+            _mem_f
+            * (
+                4e-4
+                * (log(getsize(input.uniques)) ** 8.3e-3 - 1)
+                * (getsize(input.otus) + 2e6)
+                * (threads + 5.1)
+                + 50
+            )
+        ) * 2 ** (attempt - 1)
+    return lambda _, input, attempt: (
+        _mem_f * (2e-5 * getsize(input.otus) * (threads - 0.8) + 20)
+    ) * 2 ** (attempt - 1)
+
 
 def otutab_timefunc(program, maxaccepts, maxrejects, threads):
     if program == "usearch":
-        return lambda _, input, attempt: (_time_f * (1.5e-13 * threads**-1 * getsize(input.uniques) * (getsize(input.otus)+4.2e5) * maxrejects**0.65 + 5)) * 2**(attempt-1)
-    return lambda _, input, attempt: (_time_f * (4e-15 * threads**-1 * getsize(input.uniques) * (getsize(input.otus)+8.4e6) * (maxrejects+20) + 5)) * 2**(attempt-1)
+        return lambda _, input, attempt: (
+            _time_f
+            * (
+                1.5e-13
+                * threads**-1
+                * getsize(input.uniques)
+                * (getsize(input.otus) + 4.2e5)
+                * maxrejects**0.65
+                + 5
+            )
+        ) * 2 ** (attempt - 1)
+    return lambda _, input, attempt: (
+        _time_f
+        * (
+            4e-15
+            * threads**-1
+            * getsize(input.uniques)
+            * (getsize(input.otus) + 8.4e6)
+            * (maxrejects + 20)
+            + 5
+        )
+    ) * 2 ** (attempt - 1)
 
 
 rule cluster_unoise3:
@@ -128,13 +192,19 @@ rule cluster_unoise3:
     # threads:
     # VSEARCH works in parallel (although cores seem to be used only ~50%) while
     # USEARCH v11 does not appear to use more than 1 thread
-    threads:
-        workflow.cores if with_default("program", "unoise3") == "vsearch" else 1
+    threads: workflow.cores if with_default("program", "unoise3") == "vsearch" else 1
     resources:
-        mem_mb=unoise3_memfunc(with_default("program", "unoise3"), config["unoise3"]["min_size"], 
-                               workflow.cores),
-        runtime=unoise3_timefunc(with_default("program", "unoise3"), config["unoise3"]["min_size"],
-                                 with_default("maxrejects", "unoise3"), workflow.cores),
+        mem_mb=unoise3_memfunc(
+            with_default("program", "unoise3"),
+            config["unoise3"]["min_size"],
+            workflow.cores,
+        ),
+        runtime=unoise3_timefunc(
+            with_default("program", "unoise3"),
+            config["unoise3"]["min_size"],
+            with_default("maxrejects", "unoise3"),
+            workflow.cores,
+        ),
     script:
         "scripts/unoise3.sh"
 
@@ -156,7 +226,9 @@ rule cluster_uparse:
         "envs/uvsnake.yaml"
     resources:
         mem_mb=uparse_memfunc(config["uparse"]["min_size"]),
-        runtime=uparse_timefunc(config["uparse"]["min_size"], with_default("maxaccepts", "uparse")),
+        runtime=uparse_timefunc(
+            config["uparse"]["min_size"], with_default("maxaccepts", "uparse")
+        ),
     shell:
         """
         exec &> {log[0]}
@@ -174,7 +246,7 @@ rule cluster_uparse:
 
 rule usearch_make_otutab:
     params:
-        ident_threshold=config["otutab"]["ident_threshold"]/100,
+        ident_threshold=config["otutab"]["ident_threshold"] / 100,
         program=with_default("program", "otutab"),
         usearch_bin=config["usearch_binary"],
         maxaccepts=with_default("maxaccepts", "otutab"),
@@ -199,8 +271,9 @@ rule usearch_make_otutab:
         mem_mb=otutab_memfunc(with_default("program", "otutab"), workflow.cores),
         runtime=otutab_timefunc(
             with_default("program", "otutab"),
-            with_default("maxaccepts", "otutab"), with_default("maxrejects", "otutab"),
-            workflow.cores
+            with_default("maxaccepts", "otutab"),
+            with_default("maxrejects", "otutab"),
+            workflow.cores,
         ),
     script:
         "scripts/make_otutab.sh"
