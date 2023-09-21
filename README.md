@@ -93,7 +93,9 @@ However, it adds a few additional arguments to the `snakemake` call (always prin
 
 ### Cluster execution
 
-Executing on computer clusters requires [additional settings](https://snakemake.readthedocs.io/en/stable/executing/cluster.html). Here, using the `uvsnake` script (previous chapter) is recommended, since it assists with setting resource constraints on computer clusters and grouping small sample processing jobs into batches. The latter is important because submitting every single sample processing step as job is very inefficient.
+Executing on computer clusters requires [additional settings](https://snakemake.readthedocs.io/en/stable/executing/cluster.html). Here, using the `uvsnake` script (previous chapter) is a good idea, since it assists with setting resource constraints on computer clusters and grouping small sample processing jobs into batches. The latter is important because submitting every single sample processing step as job is very inefficient.
+
+ *Note*: an altenative would be to use [profiles](https://snakemake.readthedocs.io/en/latest/executing/cli.html#profiles), see [this example](https://github.com/jdblischak/smk-simple-slurm/blob/main/examples/job-grouping/simple/config.yaml). This may be better documented in the future.
 
 It may also make sense to restart failed jobs with `-T/--retries`, in case they failed because of wrong time/memory constraints. Here an example running on a SLURM cluster with a total of three tries and a maximum of 100 parallel sample processing jobs:
 
