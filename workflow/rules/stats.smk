@@ -25,6 +25,6 @@ rule stats:
     log:
         "logs/sample_report.log",
     conda:
-        "envs/qc.yaml"
+        "../envs/qc.yaml"
     script:
         "../scripts/stats_paired.py"

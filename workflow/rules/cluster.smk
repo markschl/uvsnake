@@ -20,7 +20,7 @@ rule filter_derep:
     log:
         "logs/cluster/1_filter_derep/{primers}/{sample}.log",
     conda:
-        "envs/uvsnake.yaml"
+        "../envs/uvsnake.yaml"
     group:
         "sample"
     resources:
@@ -47,7 +47,7 @@ rule collect_derep:
     log:
         "logs/cluster/2_unique_all/{primers}.log",
     conda:
-        "envs/uvsnake.yaml"
+        "../envs/uvsnake.yaml"
     resources:
         mem_mb=mem_func(10, f=20),  #  ~11MB per compressed input MB
         runtime=time_func(5, f=0.08),  # 0.0014min/MiB  
@@ -92,7 +92,7 @@ rule cluster_unoise3:
     log:
         "logs/cluster/3_cluster/{primers}_unoise3.log",
     conda:
-        "envs/uvsnake.yaml"
+        "../envs/uvsnake.yaml"
     # threads:
     # VSEARCH works in parallel (although cores seem to be used only ~50%) while
     # USEARCH v11 does not appear to use more than 1 thread
@@ -127,7 +127,7 @@ rule cluster_uparse:
     log:
         "logs/cluster/3_cluster/{primers}_uparse.log",
     conda:
-        "envs/uvsnake.yaml"
+        "../envs/uvsnake.yaml"
     resources:
         mem_mb=uparse_memfunc(config["uparse"]["min_size"]),
         runtime=uparse_timefunc(
@@ -170,7 +170,7 @@ rule usearch_make_otutab:
     log:
         "logs/cluster/4_otutab/{primers}_{what}.log",
     conda:
-        "envs/uvsnake.yaml"
+        "../envs/uvsnake.yaml"
     resources:
         mem_mb=otutab_memfunc(with_default("program", "otutab"), workflow.cores),
         runtime=otutab_timefunc(
@@ -199,7 +199,7 @@ rule usearch_make_otutab:
 #     log:
 #         "logs/cluster/3_cluster/{primers}_post_cluster.log",
 #     conda:
-#         "envs/uvsnake.yaml"
+#         "../envs/uvsnake.yaml"
 #     group:
 #         "cluster"
 #     threads:

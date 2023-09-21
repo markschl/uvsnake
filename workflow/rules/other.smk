@@ -12,7 +12,7 @@ rule dump_config:
     log:
         "logs/dump_config.log",
     conda:
-        "envs/uvsnake.yaml"
+        "../envs/uvsnake.yaml"
     script:
         "../scripts/dump_config.py"
 
@@ -27,7 +27,7 @@ rule make_primer_fasta:
     log:
         "logs/make_primer_fasta.log",
     conda:
-        "envs/uvsnake.yaml"
+        "../envs/uvsnake.yaml"
     script:
         "../scripts/make_primer_fasta.py"
 
@@ -57,7 +57,7 @@ rule combine_logs:
     log:
         "logs/combine_logs_{method}.log",
     conda:
-        "envs/uvsnake.yaml"
+        "../envs/uvsnake.yaml"
     shell:
         """
         exec 2> "{log}"

@@ -9,7 +9,7 @@ rule import_taxdb:
     log:
         "logs/sintax/import_taxdb.log",
     conda:
-        "envs/uvsnake.yaml"
+        "../envs/uvsnake.yaml"
     group:
         "taxonomy"
     script:
@@ -35,7 +35,7 @@ rule assign_taxonomy_sintax:
     group:
         "taxonomy"
     conda:
-        "envs/uvsnake.yaml"
+        "../envs/uvsnake.yaml"
     # threads:
     # VSEARCH works in parallel (although cores seem to be used only ~50%) while
     # USEARCH v11 does not appear to use more than 1 thread
@@ -56,7 +56,7 @@ rule make_tax_fasta:
     log:
         "logs/sintax/{primers}/{what}_make_tax_fasta.log",
     conda:
-        "envs/uvsnake.yaml"
+        "../envs/uvsnake.yaml"
     group:
         "taxonomy"
     shell:
@@ -79,7 +79,7 @@ rule make_tax_biom:
     log:
         "logs/sintax/{primers}/{what}_{method}_make_tax_biom.log",
     conda:
-        "envs/uvsnake.yaml"
+        "../envs/uvsnake.yaml"
     group:
         "taxonomy"
     script:

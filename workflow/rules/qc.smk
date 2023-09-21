@@ -20,7 +20,7 @@ rule fastqc:
     group:
         "sample"
     conda:
-        "envs/qc.yaml"
+        "../envs/qc.yaml"
     shell:
         """
         fastqc -q -f fastq -t 1 -o {output.outdir} {input} &> {log}
@@ -41,7 +41,7 @@ rule multiqc:
     log:
         "logs/qc/multiqc.log",
     conda:
-        "envs/qc.yaml"
+        "../envs/qc.yaml"
     resources:
         mem_mb=mem_func(1000),
         runtime=time_func(120),
@@ -64,7 +64,7 @@ rule multiqc_all:
     log:
         "logs/qc/multiq_all.log",
     conda:
-        "envs/qc.yaml"
+        "../envs/qc.yaml"
     resources:
         mem_mb=mem_func(1000),
         runtime=time_func(120),
@@ -81,6 +81,6 @@ rule clean_qc:
     log:
         "logs/clean_qc.log",
     conda:
-        "envs/uvsnake.yaml"
+        "../envs/uvsnake.yaml"
     shell:
         "rm -Rf qc 2> {log}"
