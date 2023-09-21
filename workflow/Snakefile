@@ -24,10 +24,10 @@ include: "rules/clean.smk"
 if "_input" in config:
 
     include: "rules/qc.smk"
-    include: "rules/stats.smk"
     include: "rules/prepare_paired.smk"
     include: "rules/cluster_resources.smk"
     include: "rules/cluster.smk"
+    include: "rules/stats.smk"
     include: "rules/other.smk"
     include: "rules/targets.smk"
 
