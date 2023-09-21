@@ -18,7 +18,9 @@ def make_primer_fasta(primers, fwd_out, rev_out, rev_rev_out):
 
 
 with file_logging(snakemake.log[0]):
-    make_primer_fasta(snakemake.params.primer_config,
-                        snakemake.output.fwd,
-                        snakemake.output.rev,
-                        snakemake.output.reverse_rev)
+    make_primer_fasta(
+        snakemake.params.primer_config,
+        snakemake.output.fwd,
+        snakemake.output.rev,
+        snakemake.output.reverse_rev
+    )

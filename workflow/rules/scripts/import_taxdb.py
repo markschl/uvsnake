@@ -18,11 +18,13 @@ def is_gzip(filename):
     with open(filename, "rb") as f:
         return f.read(2) == b"\x1f\x8b"
 
+
 @contextmanager
 def fasta_reader(filename):
     _open = gzip.open if is_gzip(filename) else open
     with _open(filename, mode="rt", encoding="ascii", errors="replace") as f:
         yield FastaIterator(f)
+
 
 @contextmanager
 def fasta_writer(filename):
@@ -36,19 +38,23 @@ def convert_taxdb_utax(input, output):
     with fasta_reader(input) as records, fasta_writer(output) as out:
         for rec in records:
             s = rec.description.split(" ", 1)
-            assert len(s) == 2, "Invalid taxonomy file header: {}".format(rec.description)
+            assert len(s) == 2, "Invalid taxonomy file header: {}".format(
+                rec.description)
             lineage = s[1]
             # some characters have a special meaning in the UTAX format, convert to '_'
             # (including spaces in names)
             lineage = reserved_chars.sub('_', lineage)
             # split into components
             try:
-                lineage = [rank_pat.fullmatch(r).groups() for r in lineage.split(';')]
+                lineage = [rank_pat.fullmatch(r).groups()
+                           for r in lineage.split(';')]
             except AttributeError:
-                raise Exception("Not a valid QIIME-formatted lineage: {}".format(lineage))
+                raise Exception(
+                    "Not a valid QIIME-formatted lineage: {}".format(lineage))
             # remove empty ranks, since the UTAX format does not require every rank
             # in every lineage
-            lineage_out = [(rank, name) for rank, name in lineage if name.strip() != ""]
+            lineage_out = [(rank, name)
+                           for rank, name in lineage if name.strip() != ""]
             # final format
             rec.id = "{id};tax={tax};".format(
                 id=rec.id,
@@ -72,6 +78,8 @@ def import_taxdb(input, output, format):
 
 
 with file_logging(snakemake.log[0]):
-    import_taxdb(snakemake.input.db,
-                    snakemake.output.db, 
-                    snakemake.params.format)
+    import_taxdb(
+        snakemake.input.db,
+        snakemake.output.db,
+        snakemake.params.format
+    )

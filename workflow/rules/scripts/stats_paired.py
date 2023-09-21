@@ -12,7 +12,8 @@ def write_stats(merge_stats, trim_stats, filter_stats, primer_combinations, outf
     trim = read_stats(trim_stats, key=lambda f: basename(f).replace("_stats.txt", ""))
     flt = read_stats(
         filter_stats,
-        key=lambda f: (basename(dirname(dirname(f))), basename(f).replace("_stats.txt", "")),
+        key=lambda f: (basename(dirname(dirname(f))),
+                       basename(f).replace("_stats.txt", "")),
     )
     flt2 = defaultdict(dict)
     for k, n in flt.items():
@@ -37,7 +38,7 @@ def write_stats(merge_stats, trim_stats, filter_stats, primer_combinations, outf
                 f"Number of sequences in logfiles from read merging and primer "
                 "trimming does not match: {n_merged} vs. {m2}")
             row = [
-                sample, 
+                sample,
                 n_raw,
                 n_merged, percent(n_merged, n_raw),
                 n_fwd, percent(n_fwd, n_merged),
@@ -64,8 +65,11 @@ def percent(x, y):
     return round(100 * x / y, 2) if y > 0 else 0.0
 
 
-
 with file_logging(snakemake.log[0]):
-    write_stats(snakemake.input.merge, snakemake.input.trim, snakemake.input.filter,
-                snakemake.params.primer_combinations,
-                snakemake.output[0])
+    write_stats(
+        snakemake.input.merge,
+        snakemake.input.trim,
+        snakemake.input.filter,
+        snakemake.params.primer_combinations,
+        snakemake.output[0]
+    )

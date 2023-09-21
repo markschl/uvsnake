@@ -1,5 +1,6 @@
 from os.path import dirname
 
+
 localrules:
     stats_paired,
     clean_qc,

@@ -25,11 +25,13 @@ include: "rules/clean.smk"
 # This allows using this workflow as module
 # (where schema validation can be skipped)
 if "_input" in config:
+
     include: "rules/qc.smk"
     include: "rules/prepare_paired.smk"
     include: "rules/cluster_resources.smk"
     include: "rules/cluster.smk"
     include: "rules/other.smk"
     include: "rules/targets.smk"
+
 
 include: "rules/taxonomy.smk"

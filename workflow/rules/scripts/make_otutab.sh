@@ -1,8 +1,5 @@
-
-
-exec &> "${snakemake_log[0]}"
+exec &>"${snakemake_log[0]}"
 set -xeuo pipefail
-
 
 if [[ "${snakemake_params[program]}" == "vsearch" ]]; then
     # prepare optional parameters
@@ -19,25 +16,25 @@ if [[ "${snakemake_params[program]}" == "vsearch" ]]; then
     # https://www.drive5.com/usearch/manual/cmd_otutab.html
     # VSEARCH -usearch_global needs to be told these things
     zstd -dcq "${snakemake_input[uniques]}" |
-    vsearch \
-        --usearch_global - \
-        --db "${snakemake_input[otus]}" \
-        --id "${snakemake_params[ident_threshold]}" \
-        --maxaccepts "${snakemake_params[maxaccepts]}" \
-        --maxrejects "${snakemake_params[maxrejects]}" \
-        --otutabout "${snakemake_output[tab]%.gz}" \
-        --biomout "${snakemake_output[biom]}" \
-        --strand plus \
-        --sizein \
-        --notmatched "${snakemake_output[notmatched]%.zst}" \
-        --threads ${snakemake[threads]} \
-        $extra
+        vsearch \
+            --usearch_global - \
+            --db "${snakemake_input[otus]}" \
+            --id "${snakemake_params[ident_threshold]}" \
+            --maxaccepts "${snakemake_params[maxaccepts]}" \
+            --maxrejects "${snakemake_params[maxrejects]}" \
+            --otutabout "${snakemake_output[tab]%.gz}" \
+            --biomout "${snakemake_output[biom]}" \
+            --strand plus \
+            --sizein \
+            --notmatched "${snakemake_output[notmatched]%.zst}" \
+            --threads ${snakemake[threads]} \
+            $extra
 
     # SAM > BAM
     if [ -s "$sam" ]; then
         rm -f "${snakemake_input[otus]}".fai "${snakemake_params[bam_out]}".bai
         samtools view -T "${snakemake_input[otus]}" -b "$sam" |
-            samtools sort -@ ${snakemake[threads]} > "${snakemake_params[bam_out]}"
+            samtools sort -@ ${snakemake[threads]} >"${snakemake_params[bam_out]}"
         rm "$sam" "${snakemake_input[otus]}".fai
         samtools index "${snakemake_params[bam_out]}"
     fi
@@ -55,7 +52,7 @@ elif [[ "${snakemake_params[program]}" == "usearch" ]]; then
         -notmatched "${snakemake_output[notmatched]%.zst}" \
         -threads ${snakemake[threads]} \
         1>&2
-        # -biomout "${snakemake_output[biom]}" \
+    # -biomout "${snakemake_output[biom]}" \
     rm "$uniques"
 
     # Convert OTU tab to BIOM
