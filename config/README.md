@@ -1,7 +1,70 @@
+# Configuration
 
+The configuration lives in the `config` directory. The `config/config.yaml` and the `config/samples.tsv` need to be modified according to your needs.
+
+## Primers
+
+As a minimum, the `primers` section needs to contain the correct primer sequences:
+
+```yaml
+primers:
+  forward:
+    - fwd_name: SEQUENCE
+  reverse:
+    - rev_name: SEQUENCE
+```
+
+## Sample files
+
+The sample file `config/samples.tsv` has to list all sample files to be processed. You may use [make_sample_tab](https://github.com/markschl/ngs-sample-tab) for this purpose. Example:
+
+```sh
+make_sample_tab -d path/to/fastq_files/run1 -f simple
+```
+
+The message indicates that paired-end Illumina reads were found:
+
+```
+Automatically inferred sample pattern: 'illumina'
+120 samples from 'run1' (paired-end) written to samples_run1_paired.tsv
+```
+
+The content of `samples_run1_paired.tsv` may look like this:
+
+```
+id	R1	R2
+sample1	path/to/fastq_files/run1/sample1_R1.fastq.gz	path/to/fastq_files/run1/sample1_R2.fastq.gz
+sample2	path/to/fastq_files/run1/sample2_R1.fastq.gz	path/to/fastq_files/run1/sample2_R2.fastq.gz
+(...)
+```
+
+Then, we move the file to `config/samples.tsv`
+
+```sh
+mv samples_run1_paired.tsv config/samples.tsv
+```
+
+Alternatively, specify a custom location for the sample file in `config/config.yaml`:
+
+```yaml
+sample_file: samples_run1_paired.tsv
+```
+
+## USEARCH
+
+The pipeline is configured to use VSEARCH for all steps, but in case of using USEARCH (`program: usearch`), first obtain the software [here](https://www.drive5.com/usearch/download.html), and make sure that it is installed as `usearch` in `$PATH`. Alternatively, specify `usearch_binary: path/to/usearch`.
+
+## Other options
+
+In the following, the structure of `config/config.yaml` is shown along with detailed comments.
+
+The following sections are mandatory (described below): `primers`, `merge`, `filter`, `otutab`
+
+The following sections are optional: `defaults`, `usearch_binary`, `sample_file`, `uparse`, `unoise3`. *uparse* and *unoise3* are needed if the corresponding target rule is actually run.
+
+```yaml
 defaults:
-  # Program to use by default for read merging, denoising OTU table construction 
-  # and post-clustering.
+  # Program to use by default for read merging, denoising and OTU table construction 
   # The output should still be similar between USEARCH and VSEARCH, except for
   # the read merging, where VSEARCH is more conservative (see comment below)
   # This default can still be overridden by the individual program settings
@@ -37,15 +100,13 @@ input:
 primers:
   forward:
     # this is a list with one or several primers (depending on what you have in the run)
-    - ITS3-KYO2: GGGATGAAGAACGYAGYRAA
-    - fITS7: GTGARTCATCGAATCTTTG
+    - fwd_primer1: SEQUENCE1
+    # Instead or in addition to using degenerate primers, there can also
+    # be a mix of different oligos, which all start at the same position
+    # in the locus
+    - fwd_primer2: SEQUENCE2, SEQUENCE3
   reverse:
-    - ITS4:
-        # Instead or in addition to using degenerate primers, there can also
-        # be a mix of different oligos, which all start at the same position
-        # in the locus
-        AATCCTCCGCTTATTGATATGC,
-        AATCCTCCGCTGAWTAATATGC
+    - rev_primer1: SEQUENCE4
      # (optional) list of primer combinations
      # (if not supplied, all combinations are used)
      # Every combination will obtain its own results directory
@@ -136,3 +197,4 @@ sintax:
   # # (only used by USEARCH:)
   # maxaccepts: 8
   # maxrejects: 8
+```

@@ -21,18 +21,14 @@ include: "rules/common.smk"
 include: "rules/clean.smk"
 
 
-# Initialize regular pipeline if configuration is present.
+# Initialize regular pipeline there is valid sample file.
 # This allows using this workflow as module
 # (where schema validation can be skipped)
-if "input" in config and "primers" in config:
-
+if "_input" in config:
     include: "rules/qc.smk"
     include: "rules/prepare_paired.smk"
     include: "rules/cluster.smk"
     include: "rules/other.smk"
     include: "rules/targets.smk"
 
-
-if "sintax" in config:
-
-    include: "rules/taxonomy.smk"
+include: "rules/taxonomy.smk"

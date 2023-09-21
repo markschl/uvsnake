@@ -1,5 +1,5 @@
 import os
-from os.path import dirname
+from os.path import dirname, exists
 from glob import glob
 from collections import OrderedDict
 
@@ -14,10 +14,10 @@ from snakemake.workflow import srcdir
 # initialize samples if corresponding sections present in configuration
 # (otherwise we assume that uvsnake is used as Snakemake module and not all
 # functionality may be needed)
-if "input" in config and "primers" in config:
+if "sample_file" in config and exists(config["sample_file"]) and "primers" in config:
     # further add these settings to config (_underscore indicates that they are special)
     config["_primers"], config["_primer_combinations"] = get_primer_combinations(config)
-    l = SampleList(config["input"]["sample_file"])
+    l = SampleList(config["sample_file"])
     config["_input"] = OrderedDict(l.samples())
     config["_sample_names"] = list(config["_input"])
     assert len(config["_sample_names"]) == len(

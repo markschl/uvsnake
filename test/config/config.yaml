@@ -5,9 +5,6 @@ defaults:
   maxaccepts: 1
   maxrejects: 1
 
-input:
-  sample_file: config/samples.tsv
-
 primers:
   forward:
     - ITS3-KYO2:

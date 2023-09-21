@@ -1,0 +1,40 @@
+defaults:  # optional, defaults are shown here, but may be modified
+  program: vsearch
+  maxaccepts: 1
+  maxrejects: 1
+
+primers:
+  forward:
+    - fwd_name: SEQUENCE
+  reverse:
+    - rev_name: SEQUENCE
+  trim_settings:
+    min_overlap: 15
+    max_error_rate: 0.1
+    min_length: 100
+
+merge:
+  overlap_ident: 75
+  max_diffs: 1000
+
+filter:
+  max_error_rate: 0.002
+
+# (optional, only needed if 'uparse' rule is run)
+uparse:
+  min_size: 2
+
+# (optional, only needed if 'unoise3' rule is run)
+unoise3:
+  min_size: 8
+
+otutab:
+  ident_threshold: 97
+  # higher values -> slower, but more precise OTU table
+  maxaccepts: 8
+  maxrejects: 8
+
+sintax:
+  db: refdb.fasta.gz
+  db_format: qiime
+  confidence: 0.7

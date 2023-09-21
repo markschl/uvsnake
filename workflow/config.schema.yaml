@@ -29,15 +29,12 @@ properties:
         (relative to analysis directory containing 'config') can be
         specified.
 
-  input:
-    type: object
-    properties:
-      sample_file:
-        type: string
-        description: >
-          Path to a sample file with one forward 
-    required: [sample_file]
+  sample_file:
+    type: string
+    description: >
+      Path to a sample file with one forward   
     additionalProperties: false
+    default: config/samples.tsv
 
   primers:
     type: object
@@ -202,4 +199,4 @@ properties:
 
 additionalProperties: false
 
-required: [input, primers, merge, filter, otutab]
+required: [primers, merge, filter, otutab]
