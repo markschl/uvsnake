@@ -5,7 +5,6 @@ set -xeuo pipefail
 
 
 # First, filter using max. error rate
-# TODO: min. length currently does nothing since this filtering was done after trimming already
 # This is always done with VSEARCH, since there is no difference
 # in how USEARCH and VSEARCH do it.
 sample="${snakemake_wildcards[sample]}"
