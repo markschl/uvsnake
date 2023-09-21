@@ -61,7 +61,7 @@ rm -R unite unite.tar.gz
 
 These commands run all the clustering workflows (on a local computer) and visualize the results (see `test/R_example/example.Rmd` and the [analysis output](R_example/example.md)). This needs to be done in the 'uvsnake' directory.
 
-Note that by default, `uvsnake` only uses one processor (no parallel processing). In our case this is intended, since the analysis outcome is always the same, except for SINTAX, which does random bootstrapping. To use multiple processors, specify their number with the `-c/--cores` argument. 
+Note that by default, `uvsnake` does not do any parallel processing. In our case this is intended, since the analysis outcome is always the same, except for SINTAX, which does random bootstrapping. To use multiple parallel processes, specify their number with the `-c/--cores` argument. 
 
 
 ```sh
@@ -69,11 +69,11 @@ conda activate snakemake
 
 # Run the UNOISE3 and UPARSE pipelines
 # (using VSEARCH, as configured in test/config/config.yaml)
-./uvsnake test unoise3 uparse
+./uvsnake -d test unoise3 uparse
 
 # Now, we can assign the taxonomy using the 'sintax' rule
 # using the previously assembled database
-./uvsnake test sintax
+./uvsnake -d test sintax
 
 # We may also compare the results with the expected sequences using
 # VSEARCH -usearch_global
@@ -92,10 +92,10 @@ export RSTUDIO_PANDOC=/usr/lib/rstudio/resources/app/bin/quarto/bin/tools
 Rscript -e "rmarkdown::render('test/R_example/example.Rmd', 'github_document')"
 
 # (optional) remove working directory and logs
-./uvsnake test clean
+./uvsnake -d test clean
 
 # the following command removes everything (INCLUDING the results directory)
-./uvsnake test clean_all
+./uvsnake -d test clean_all
 ```
 
 This figure from the [`R_example`](R_example/example.md) analysis shows that the mixed relative genomic DNA concentration of the isolates corresponds well to the relative read abundance in the samples.
