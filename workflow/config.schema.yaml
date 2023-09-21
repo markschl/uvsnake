@@ -9,7 +9,6 @@ properties:
       program:
         type: string
         enum: [vsearch, usearch]
-        default: vsearch
       maxaccepts:
         type: integer
         minimum: 1
@@ -199,4 +198,4 @@ properties:
 
 additionalProperties: false
 
-required: [primers, merge, filter, otutab]
+required: [defaults, primers, merge, filter, otutab]

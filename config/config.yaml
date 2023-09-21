@@ -1,5 +1,6 @@
-defaults:  # optional, defaults are shown here, but may be modified
+defaults:
   program: vsearch
+  # optional (these are the defaults)
   maxaccepts: 1
   maxrejects: 1
 
