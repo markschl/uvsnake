@@ -1,3 +1,5 @@
+from os.path import dirname
+
 localrules:
     stats_paired,
     clean_qc,
@@ -7,7 +9,8 @@ rule fastqc:
     input:
         lambda wildcards: config["_input"][wildcards.sample],
     output:
-        expand(
+        outdir=directory("qc/fastqc/{sample}"),
+        outfiles=expand(
             "qc/fastqc/{{sample}}/{{sample}}_R{read}_fastqc.{ext}",
             read=[1, 2] if config["_layout"] == "paired" else [1],
             ext=("html", "zip"),
@@ -17,16 +20,16 @@ rule fastqc:
     group:
         "sample"
     conda:
-        "envs/uvsnake.yaml"
+        "envs/qc.yaml"
     shell:
         """
-        outdir=$(dirname "{output[0]}")
-        mkdir -p "$outdir"
-        fastqc -q -f fastq -t 1 -o "$outdir" {input} 2> {log}
+        fastqc -q -f fastq -t 1 -o {output.outdir} {input} &> {log}
         """
 
 
 rule multiqc:
+    params:
+        fastqc_dir=lambda w, input: dirname(dirname(input.fastqc[0])),
     input:
         fastqc=expand(
             "qc/fastqc/{sample}/{sample}_R{read}_fastqc.html",
@@ -38,14 +41,13 @@ rule multiqc:
     log:
         "logs/qc/multiqc.log",
     conda:
-        "envs/uvsnake.yaml"
+        "envs/qc.yaml"
     resources:
         mem_mb=mem_func(1000),
         runtime=time_func(120),
     shell:
         """
-        indir=$(dirname $(dirname {input.fastqc[0]}))
-        multiqc -f -m fastqc -o $(dirname {output}) $indir 2> {log}
+        multiqc -f -m fastqc -o $(dirname {output}) {params.fastqc_dir} 2> {log}
         """
 
 
@@ -58,11 +60,11 @@ rule multiqc_all:
             direction=["fwd", "rev"],
         ),
     output:
-        "qc/multiqc/multiqc_report_all.html",
+        "qc/multiqc_all/multiqc_report.html",
     log:
         "logs/qc/multiq_all.log",
     conda:
-        "envs/uvsnake.yaml"
+        "envs/qc.yaml"
     resources:
         mem_mb=mem_func(1000),
         runtime=time_func(120),
@@ -96,10 +98,14 @@ rule stats_paired:
         "results/sample_report.tsv",
     log:
         "logs/sample_report.log",
+    conda:
+        "envs/qc.yaml"
     script:
         "scripts/stats_paired.py"
 
 
 rule clean_qc:
+    log:
+        "logs/clean_qc.log",
     shell:
-        "rm -Rf qc"
+        "rm -Rf qc 2> {log}"

@@ -1,9 +1,8 @@
 dependencies:
+  - python >=3.6
   - vsearch=2.23
   - zstd=1.5
   - cutadapt=4.4
-  - fastqc=0.12
-  - multiqc=1.15
   - biom-format=2.1.15
   - samtools=1.17
   - pyyaml=6.0
