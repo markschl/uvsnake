@@ -26,6 +26,8 @@ rule make_primer_fasta:
         reverse_rev="workdir/primers/reverse_rev.fasta",
     log:
         "logs/make_primer_fasta.log",
+    conda:
+        "envs/uvsnake.yaml"
     script:
         "scripts/make_primer_fasta.py"
 
@@ -52,8 +54,11 @@ rule combine_logs:
         ),
     output:
         "logs/cluster_{method}_all.log",
+    log:
+        "logs/combine_logs_{method}.log",
     shell:
         """
+        exec 2> "{log}"
         exec 1> "{output}"
         echo "Paired-end read merging"
         echo "======================="
