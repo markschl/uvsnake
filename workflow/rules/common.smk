@@ -3,13 +3,11 @@ from os.path import dirname, exists
 from glob import glob
 from collections import OrderedDict
 
-from utils.primers import get_primer_combinations
-from utils.sample_list import SampleList
+include: "utils.smk"
 
 
 #### Initialize ####
 
-from snakemake.workflow import srcdir
 
 # initialize samples if corresponding sections present in configuration
 # (otherwise we assume that uvsnake is used as Snakemake module and not all
@@ -26,6 +24,7 @@ if "sample_file" in config and exists(config["sample_file"]):
         set(config["_sample_names"])
     ), "Duplicate sample names found"
     config["_layout"] = l.layout
+
 # from pprint import pprint; pprint(config)
 
 
