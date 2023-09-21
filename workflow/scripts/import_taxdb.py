@@ -80,6 +80,7 @@ def import_taxdb(input, output, format):
 def file_logging(f):
     with open(f, "w") as handle:
         sys.stderr = sys.stdout = handle
+        yield
 
 
 with file_logging(snakemake.log[0]):

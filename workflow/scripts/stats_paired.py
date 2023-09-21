@@ -84,6 +84,7 @@ def percent(x, y):
 def file_logging(f):
     with open(f, "w") as handle:
         sys.stderr = sys.stdout = handle
+        yield
 
 
 with file_logging(snakemake.log[0]):
