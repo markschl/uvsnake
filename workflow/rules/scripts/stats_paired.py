@@ -1,3 +1,4 @@
+import copy
 from os.path import dirname, basename
 import csv
 from collections import defaultdict
@@ -5,11 +6,13 @@ from collections import defaultdict
 from utils import file_logging
 
 
-def write_stats(merge_stats, trim_stats, filter_stats, primer_combinations, outfile):
+def write_stats(merge_stats, trim_stats, filter_stats, primer_combinations, outfile, report_file):
     # read data into dict with sample names as keys
     # TODO: depends on file paths
-    merge = read_stats(merge_stats, key=lambda f: basename(f).replace("_stats.txt", ""))
-    trim = read_stats(trim_stats, key=lambda f: basename(f).replace("_stats.txt", ""))
+    merge = read_stats(merge_stats, key=lambda f: basename(
+        f).replace("_stats.txt", ""))
+    trim = read_stats(trim_stats, key=lambda f: basename(
+        f).replace("_stats.txt", ""))
     flt = read_stats(
         filter_stats,
         key=lambda f: (basename(dirname(dirname(f))),
@@ -20,17 +23,29 @@ def write_stats(merge_stats, trim_stats, filter_stats, primer_combinations, outf
         flt2[k[1]][k[0]] = n
 
     # combine and write to output
-    with open(outfile, 'w') as out:
+    with open(outfile, 'w') as out, open(report_file, 'w') as rep:
         writer = csv.writer(out, delimiter='\t')
-        header = ['sample',
-                  'raw',
-                  'merged', 'percent-merged',
-                  'fwd-primer', 'fwd-percent-of-merged',
-                  'rev-primer', 'rev-percent-of-merged',
-                  'long-enough', 'long-percent-of-merged']
+        rep_writer = csv.writer(rep, delimiter='\t')
+        header = [
+            'sample',
+            'raw',
+            'merged', 'percent-merged',
+            'fwd-primer', 'fwd-percent-of-merged',
+            'rev-primer', 'rev-percent-of-merged',
+            'long-enough', 'long-percent-of-merged']
+        rep_header = [
+            'sample',
+            'raw',
+            'merged', '%',
+            'fwd-primer', '%',
+            'rev-primer', '%',
+            'long-enough', '%']
         for p in primer_combinations:
             header += [p, "filtered", "filtered-percent-of-trimmed"]
+            rep_header += [p, "filtered", "% of trimmed"]
         writer.writerow(header)
+        rep_writer.writerow(rep_header)
+
         for sample in merge:
             n_raw, n_merged = merge[sample]
             m2, n_fwd, n_rev, n_long_enough = trim[sample]
@@ -51,6 +66,7 @@ def write_stats(merge_stats, trim_stats, filter_stats, primer_combinations, outf
                 total = kept + removed
                 row += [total, kept, percent(kept, total)]
             writer.writerow(row)
+            rep_writer.writerow(row)
 
 
 def read_stats(files, key):
@@ -71,5 +87,6 @@ with file_logging(snakemake.log[0]):
         snakemake.input.trim,
         snakemake.input.filter,
         snakemake.params.primer_combinations,
-        snakemake.output[0]
+        snakemake.output.tsv,
+        snakemake.output.report
     )

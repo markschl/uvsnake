@@ -4,18 +4,11 @@ from snakemake.utils import min_version, validate
 # https://github.com/snakemake/snakemake/blob/main/CHANGELOG.md
 min_version("7.14.0")
 
-
-##### configuration #####
-
-
 configfile: "config/config.yaml"
-
 
 validate(config, "config.schema.yaml")
 
-
-##### load rules #####
-
+report: "report/workflow.rst"
 
 include: "rules/common.smk"
 include: "rules/clean.smk"
@@ -27,6 +20,7 @@ include: "rules/clean.smk"
 if "_input" in config:
 
     include: "rules/qc.smk"
+    include: "rules/stats.smk"
     include: "rules/prepare_paired.smk"
     include: "rules/cluster_resources.smk"
     include: "rules/cluster.smk"

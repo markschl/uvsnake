@@ -2,7 +2,6 @@ from os.path import dirname
 
 
 localrules:
-    stats_paired,
     clean_qc,
 
 
@@ -76,33 +75,6 @@ rule multiqc_all:
         cutadapt_dir=$(dirname $(dirname {input.cutadapt[0]}))
         multiqc -f -m fastqc -m cutadapt -o $outdir $indir $cutadapt_dir 2> {log}
         """
-
-
-rule stats_paired:
-    params:
-        primer_combinations=config["_primer_combinations"],
-    input:
-        merge=expand(
-            "workdir/prepare_paired/1_merge/{sample}/{sample}_stats.txt",
-            sample=config["_sample_names"],
-        ),
-        trim=expand(
-            "workdir/prepare_paired/2_trim/{sample}/{sample}_stats.txt",
-            sample=config["_sample_names"],
-        ),
-        filter=expand(
-            "workdir/cluster/1_filter_derep/{primers}/{sample}/{sample}_stats.txt",
-            primers=config["_primer_combinations"],
-            sample=config["_sample_names"],
-        ),
-    output:
-        "results/sample_report.tsv",
-    log:
-        "logs/sample_report.log",
-    conda:
-        "envs/qc.yaml"
-    script:
-        "scripts/stats_paired.py"
 
 
 rule clean_qc:

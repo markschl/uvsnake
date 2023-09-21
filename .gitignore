@@ -3,6 +3,7 @@ logs/
 benchmarks/
 *~
 _*/
+.*/
 .snakemake*
 multiqc*
 unite_*.fasta.gz

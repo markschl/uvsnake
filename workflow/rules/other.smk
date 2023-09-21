@@ -8,7 +8,7 @@ rule dump_config:
     params:
         config=config,
     output:
-        "results/config.yaml",
+        report("results/config.yaml", category="Configuration"),
     log:
         "logs/dump_config.log",
     conda:
