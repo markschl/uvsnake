@@ -27,4 +27,4 @@ rule stats:
     conda:
         "envs/qc.yaml"
     script:
-        "scripts/stats_paired.py"
+        "../scripts/stats_paired.py"

@@ -31,7 +31,7 @@ rule merge_paired:
         # mem_mb=mem_func(120 if with_default("program", "merge") == "usearch" else 40),  # VSEARCH: ~16MB, USEARCH: <=78MB
         runtime=60,  # time_func(5, f=0.2),  # 0.003-0.006 min/MB of gzip input
     script:
-        "scripts/merge_paired.sh"
+        "../scripts/merge_paired.sh"
 
 
 rule trim_primers_paired:
@@ -63,4 +63,4 @@ rule trim_primers_paired:
         # mem_mb=mem_func(100),  # 57MB
         runtime=60,  # time_func(5, 0.15),  # 0.06min/MB (zstd input)
     script:
-        "scripts/trim_primers_paired.sh"
+        "../scripts/trim_primers_paired.sh"

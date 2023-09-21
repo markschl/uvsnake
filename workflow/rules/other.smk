@@ -14,7 +14,7 @@ rule dump_config:
     conda:
         "envs/uvsnake.yaml"
     script:
-        "scripts/dump_config.py"
+        "../scripts/dump_config.py"
 
 
 rule make_primer_fasta:
@@ -29,7 +29,7 @@ rule make_primer_fasta:
     conda:
         "envs/uvsnake.yaml"
     script:
-        "scripts/make_primer_fasta.py"
+        "../scripts/make_primer_fasta.py"
 
 
 rule combine_logs:

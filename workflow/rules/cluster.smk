@@ -27,7 +27,7 @@ rule filter_derep:
         # mem_mb=mem_func(300), # very variable 10 - 230MB
         runtime=30,  #time_func(5, f=0.2),  # 0.004min/MiB  
     script:
-        "scripts/filter_derep.sh"
+        "../scripts/filter_derep.sh"
 
 
 # Combine de-replicated sample files into one
@@ -110,7 +110,7 @@ rule cluster_unoise3:
             workflow.cores,
         ),
     script:
-        "scripts/unoise3.sh"
+        "../scripts/unoise3.sh"
 
 
 rule cluster_uparse:
@@ -180,7 +180,7 @@ rule usearch_make_otutab:
             workflow.cores,
         ),
     script:
-        "scripts/make_otutab.sh"
+        "../scripts/make_otutab.sh"
 
 
 # rule post_cluster:
@@ -205,4 +205,4 @@ rule usearch_make_otutab:
 #     threads:
 #         int(workflow.cores * 1.5) if with_default("program", "post_cluster") == "vsearch" else 1
 #     script:
-#         "scripts/post_cluster.py"
+#         "../scripts/post_cluster.py"

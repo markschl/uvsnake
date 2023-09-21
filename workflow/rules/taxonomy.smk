@@ -13,7 +13,7 @@ rule import_taxdb:
     group:
         "taxonomy"
     script:
-        "scripts/import_taxdb.py"
+        "../scripts/import_taxdb.py"
 
 
 rule assign_taxonomy_sintax:
@@ -44,7 +44,7 @@ rule assign_taxonomy_sintax:
         mem_mb=5000,
         runtime=240,
     script:
-        "scripts/taxonomy_sintax.sh"
+        "../scripts/taxonomy_sintax.sh"
 
 
 rule make_tax_fasta:
@@ -83,4 +83,4 @@ rule make_tax_biom:
     group:
         "taxonomy"
     script:
-        "scripts/make_tax_biom.sh"
+        "../scripts/make_tax_biom.sh"
