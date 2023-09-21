@@ -54,13 +54,9 @@ sample_file: samples_run1_paired.tsv
 
 The pipeline is configured to use VSEARCH for all steps, but in case of using USEARCH (`program: usearch`), first obtain the software [here](https://www.drive5.com/usearch/download.html), and make sure that it is installed as `usearch` in `$PATH`. Alternatively, specify `usearch_binary: path/to/usearch`.
 
-## Other options
+## All options
 
-In the following, the structure of `config/config.yaml` is shown along with detailed comments.
-
-The following sections are mandatory (described below): `primers`, `merge`, `filter`, `otutab`
-
-The following sections are optional: `defaults`, `usearch_binary`, `sample_file`, `uparse`, `unoise3`. *uparse* and *unoise3* are needed if the corresponding target rule is actually run.
+In the following, the structure of `config/config.yaml` is shown along with detailed comments. The following sections are mandatory (described below): `primers`, `merge`, `filter`, `otutab`. The following sections are optional: `defaults`, `usearch_binary`, `sample_file`, `uparse`, `unoise3`. *uparse* and *unoise3* are needed if the corresponding target rule is actually run.
 
 ```yaml
 defaults:
