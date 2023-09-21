@@ -1,9 +1,8 @@
-import copy
+from contextlib import contextmanager
 from os.path import dirname, basename
 import csv
 from collections import defaultdict
-
-from utils import file_logging
+import sys
 
 
 def write_stats(merge_stats, trim_stats, filter_stats, primer_combinations, outfile, report_file):
@@ -79,6 +78,12 @@ def read_stats(files, key):
 
 def percent(x, y):
     return round(100 * x / y, 2) if y > 0 else 0.0
+
+
+@contextmanager
+def file_logging(f):
+    with open(f, "w") as handle:
+        sys.stderr = sys.stdout = handle
 
 
 with file_logging(snakemake.log[0]):

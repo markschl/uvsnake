@@ -8,10 +8,9 @@ import gzip
 import os
 import re
 import shutil
+import sys
 
 from Bio.SeqIO.FastaIO import FastaIterator, FastaWriter
-
-from utils import file_logging
 
 
 def is_gzip(filename):
@@ -75,6 +74,12 @@ def import_taxdb(input, output, format):
                 shutil.copyfileobj(f, o)
         else:
             os.symlink(input, output)
+
+
+@contextmanager
+def file_logging(f):
+    with open(f, "w") as handle:
+        sys.stderr = sys.stdout = handle
 
 
 with file_logging(snakemake.log[0]):
