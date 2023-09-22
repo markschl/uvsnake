@@ -1,6 +1,6 @@
 # Test data
 
-These commands download example sequencing data (Illumina NextSeq) from two uneven (staggered) mock communities (Schlegel et al. 2018) into the `test/fastq` directory.
+These commands download example sequencing data (Illumina NextSeq) from two uneven (staggered) mock communities (Schlegel et al. 2018) into the `mock_example/fastq` directory.
 
 ```sh
 # define sample URLs
@@ -9,12 +9,12 @@ urls[mock1]=https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR252/024/SRR25280624/SRR25280
 urls[mock2]=https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR252/020/SRR25280620/SRR25280620
 
 # download
-mkdir -p test/fastq
+mkdir -p mock_example/fastq
 for sample in ${!urls[@]}; do
   url_prefix=${urls[$sample]}
   echo "$url_prefix > $sample"
-  wget -O test/fastq/"$sample"_R1.fastq.gz "$url_prefix"_1.fastq.gz
-  wget -O test/fastq/"$sample"_R2.fastq.gz "$url_prefix"_2.fastq.gz
+  wget -O mock_example/fastq/"$sample"_R1.fastq.gz "$url_prefix"_1.fastq.gz
+  wget -O mock_example/fastq/"$sample"_R2.fastq.gz "$url_prefix"_2.fastq.gz
 done
 ```
 
@@ -51,7 +51,7 @@ cat $taxonomy |
 # In this example, 178141 of 234479 sequences are retained
 st set -d '{l:2}' -ul unite/tax.txt $fasta |
   st find --exclude --desc --regex ';o__;f__;g__;s__$' |
-  gzip -c > test/unite_refs.fasta.gz
+  gzip -c > mock_example/unite_refs.fasta.gz
 
 # clean up
 rm -R unite unite.tar.gz
@@ -59,7 +59,7 @@ rm -R unite unite.tar.gz
 
 ## Running the denoising/clustering pipeline
 
-These commands run all the clustering workflows (on a local computer) and visualize the results (see `test/R_example/example.Rmd` and the [analysis output](R_example/example.md)). This needs to be done in the 'uvsnake' directory.
+These commands run all the clustering workflows (on a local computer) and visualize the results (see `mock_example/R_example/example.Rmd` and the [analysis output](R_example/example.md)). This needs to be done in the 'uvsnake' directory (assuming it was fully downloaded from GitHub, not using `snakedeploy`).
 
 Note that by default, `uvsnake` does not do any parallel processing. In our case this is intended, since the analysis outcome is always the same, except for SINTAX, which does random bootstrapping. To use multiple parallel processes, specify their number with the `-c/--cores` argument. 
 
@@ -67,20 +67,24 @@ Note that by default, `uvsnake` does not do any parallel processing. In our case
 ```sh
 conda activate snakemake
 
+# (optional) remove everything from previous processing
+# (INCLUDING the results directory)
+./uvsnake -d mock_example clean_all
+
 # Run the UNOISE3 and UPARSE pipelines
-# (using VSEARCH, as configured in test/config/config.yaml)
-./uvsnake -d test unoise3 uparse
+# (using VSEARCH, as configured in mock_example/config/config.yaml)
+./uvsnake -d mock_example unoise3 uparse
 
 # Now, we can assign the taxonomy using the 'sintax' rule
 # using the previously assembled database
-./uvsnake -d test sintax
+./uvsnake -d mock_example sintax
 
 # We may also compare the results with the expected sequences using
 # VSEARCH -usearch_global
 # This allows us to match the known isolates with the observed OTUs
-out=test/results/ITS3-KYO2...ITS4
+out=mock_example/results/ITS3-KYO2...ITS4
 vsearch --usearch_global $out/unoise3.fasta \
-  --db test/mock/mock_ITS2.fasta \
+  --db mock_example/mock/mock_ITS2.fasta \
   --userout $out/mock_cmp.txt \
   --userfields 'query+target+id' \
   --id 0.97 \
@@ -89,13 +93,10 @@ vsearch --usearch_global $out/unoise3.fasta \
 ## render the example Rmd (requires pandoc in PATH or RSTUDIO_PANDOC set, here for Ubuntu)
 # If this doesn't work, you can still directly run the document in RStudio
 export RSTUDIO_PANDOC=/usr/lib/rstudio/resources/app/bin/quarto/bin/tools
-Rscript -e "rmarkdown::render('test/R_example/example.Rmd', 'github_document')"
+Rscript -e "rmarkdown::render('mock_example/R_example/example.Rmd', 'github_document')"
 
 # (optional) remove working directory and logs
-./uvsnake -d test clean
-
-# the following command removes everything (INCLUDING the results directory)
-./uvsnake -d test clean_all
+./uvsnake -d mock_example clean
 ```
 
 This figure from the [`R_example`](R_example/example.md) analysis shows that the mixed relative genomic DNA concentration of the isolates corresponds well to the relative read abundance in the samples.

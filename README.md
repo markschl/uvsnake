@@ -103,4 +103,4 @@ It may also make sense to restart failed jobs with `-T/--retries`, in case they 
 
 ## Example
 
-The [test directory](test) contains an example dataset and shows how this pipeline is validated and how the data can be analyzed in R.
+The [`mock_example` directory](mock_example) contains an example dataset and shows how this pipeline is validated and how the data can be analyzed in R.

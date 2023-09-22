@@ -3,7 +3,7 @@ fastq/
 
 !logs/
 logs/*
-!logs/*_all.log
+!logs/cluster_*_all.log
 
 *_sintax.txt.gz
 *_sintax.fasta.gz

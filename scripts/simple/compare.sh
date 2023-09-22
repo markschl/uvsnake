@@ -17,8 +17,8 @@ threads=1
 source $(conda info --base)/etc/profile.d/conda.sh
 
 # now prepare input files
-fq=test/fastq
-out=test/simple
+fq=mock_example/fastq
+out=mock_example/simple
 rm -rf $out
 mkdir -p $out/fq
 for f in $fq/*.fastq.gz; do
@@ -42,10 +42,10 @@ conda activate snakemake
 ./uvsnake test unoise3 --config 'defaults={program: vsearch}'
 
 # Run "simple" VSEARCH analysis and compare results
-pout=test/results/ITS3-KYO2...ITS4
-vout=test/simple/vsearch
+pout=mock_example/results/ITS3-KYO2...ITS4
+vout=mock_example/simple/vsearch
 conda activate uvsearch
-scripts/simple/vsearch.sh $vout test/config/config.yaml file:$fprimers file:$rprimers $threads $out/fq/*_R1.fastq &> test/simple/vsearch.log
+scripts/simple/vsearch.sh $vout mock_example/config/config.yaml file:$fprimers file:$rprimers $threads $out/fq/*_R1.fastq &> mock_example/simple/vsearch.log
 if ! cmp -s $vout/unoise3.fasta $pout/unoise3.fasta; then
   echo "VSEARCH unoise3 otutabs differ ($vout/unoise3_otutab.txt.gz $pout/unoise3_otutab.txt.gz)" >&2
   exit 1
@@ -57,9 +57,9 @@ fi
 echo "VSEARCH 'simple' pipeline does not differ from UVSnake"
 
 # for comparing biom with Meld/json.tool:
-# meld <(python -m json.tool test/simple/vsearch/unoise3.biom) <(python -m json.tool test/results/ITS3-KYO2...ITS4/unoise3.biom)
+# meld <(python -m json.tool mock_example/simple/vsearch/unoise3.biom) <(python -m json.tool mock_example/results/ITS3-KYO2...ITS4/unoise3.biom)
 # ...or the whole directories
-# meld test/results/ITS3-KYO2...ITS4 test/simple/vsearch
+# meld mock_example/results/ITS3-KYO2...ITS4 mock_example/simple/vsearch
 
 # Run USEARCH pipeline
 conda activate snakemake
@@ -68,8 +68,8 @@ conda activate snakemake
 
 # Run simple USEARCH analysis
 conda activate uvsearch
-uout=test/simple/usearch
-scripts/simple/usearch.sh $uout test/config/config.yaml file:$fprimers file:$rprimers $threads $out/fq/*_R1.fastq &> test/simple/usearch.log
+uout=mock_example/simple/usearch
+scripts/simple/usearch.sh $uout mock_example/config/config.yaml file:$fprimers file:$rprimers $threads $out/fq/*_R1.fastq &> mock_example/simple/usearch.log
 
 # for USEARCH, direct comparisons are more difficult. This has to do with the de-replication,
 # which our pipeline does separately per sample before collecting the unique sequences
@@ -101,6 +101,6 @@ for what in unoise3 uparse; do
 done
 
 # for comparing biom with Meld:
-# meld <(python -m json.tool test/simple/usearch/unoise3.biom) <(python -m json.tool test/results/ITS3-KYO2...ITS4/unoise3.biom)
+# meld <(python -m json.tool mock_example/simple/usearch/unoise3.biom) <(python -m json.tool mock_example/results/ITS3-KYO2...ITS4/unoise3.biom)
 # ...or the whole directories
-# meld test/results/ITS3-KYO2...ITS4 test/simple/usearch
+# meld mock_example/results/ITS3-KYO2...ITS4 mock_example/simple/usearch
