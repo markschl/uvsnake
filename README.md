@@ -66,7 +66,19 @@ Assign taxonomy with SINTAX:
 snakemake sintax
 ```
 
-![results](docs/taxonomy.png)
+This adds some more files with tabular output, as well as taxonomy-annotated BIOM files:
+
+```
+results/
+ ├─ fwd_primer...rev_primer/
+ │  ├─ unoise3_sintax.txt.gz
+ │  ├─ unoise3_sintax_taxtab.txt.gz
+ │  ├─ unoise3_sintax.biom.gz
+ │  ├─ uparse_sintax.txt.gz
+ │  ├─ uparse_sintax_taxtab.txt.gz
+ │  ├─ uparse_sintax.biom.gz
+ │  ├─ (...)
+```
 
 **Note**: The *taxonomy* rule should not be run together with the *unoise3* and/or *uparse* rules, but in a separate command *afterwards*. Taxonomic assignments are only done for clusters that are already present. If run before clustering, nothing happens.
 
@@ -95,7 +107,7 @@ Executing on computer clusters requires [additional settings](https://snakemake.
 
  *Note*: an altenative would be to use [profiles](https://snakemake.readthedocs.io/en/latest/executing/cli.html#profiles), see [this example](https://github.com/jdblischak/smk-simple-slurm/blob/main/examples/job-grouping/simple/config.yaml). This may be better documented in the future.
 
-It may also make sense to restart failed jobs with `-T/--retries`, in case they failed because of wrong time/memory constraints. Here an example running on a SLURM cluster with a total of three tries and a maximum of 100 parallel sample processing jobs:
+It may also make sense to restart failed jobs with `-T/--retries`, in case they failed because of time/memory constraints being too conservative. Here an example running on a SLURM cluster with a total of three tries and a maximum of 100 parallel sample processing jobs:
 
 ```sh
 ./uvsnake --slurm --cores all --jobs 100 --retries 3 quality unoise3 uparse
