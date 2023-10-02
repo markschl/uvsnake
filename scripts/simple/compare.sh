@@ -38,8 +38,8 @@ done
 
 # run the pipeline once using VSEARCH
 conda activate snakemake
-./uvsnake test clean_all
-./uvsnake test unoise3 --config 'defaults={program: vsearch}'
+./uvsnake -d mock_example clean_all
+./uvsnake -d mock_example unoise3 --config 'defaults={program: vsearch}'
 
 # Run "simple" VSEARCH analysis and compare results
 pout=mock_example/results/ITS3-KYO2...ITS4
@@ -63,8 +63,8 @@ echo "VSEARCH 'simple' pipeline does not differ from UVSnake"
 
 # Run USEARCH pipeline
 conda activate snakemake
-./uvsnake test clean_all
-./uvsnake test unoise3 uparse
+./uvsnake -d mock_example clean_all
+./uvsnake -d mock_example unoise3 uparse
 
 # Run simple USEARCH analysis
 conda activate uvsearch
