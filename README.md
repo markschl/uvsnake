@@ -31,7 +31,7 @@ conda activate snakemake
 mkdir -p path/to/project_dir
 cd path/to/project_dir
 
-snakedeploy deploy-workflow https://github.com/markschl/uvsnake . --branch main
+snakedeploy deploy-workflow https://github.com/markschl/uvsnake . --tag v0.1
 ```
 
 ## Configuration
@@ -91,7 +91,7 @@ There is a simple script that runs Snakemake with a few default options to save 
 We first need to download the script (UNIX):
 
 ```sh
-wget https://raw.githubusercontent.com/markschl/uvsnake/main/uvsnake
+wget https://raw.githubusercontent.com/markschl/uvsnake/v0.1/uvsnake
 chmod +x uvsnake
 ```
 
