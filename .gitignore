@@ -15,3 +15,5 @@ unite_*.fasta.gz
 .idea
 .Rhistory
 .DS_Store
+
+!.snakemake-workflow-catalog.yml
