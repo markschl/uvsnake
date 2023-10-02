@@ -1,6 +1,46 @@
 # Configuration
 
-The configuration lives in the `config` directory. The `config/config.yaml` and the `config/samples.tsv` need to be modified according to your needs.
+The configuration lives in the `config` directory and is named `config.yaml`. It roughly looks like this:
+
+```yaml
+defaults:
+  program: usearch
+  maxaccepts: 1
+  maxrejects: 1
+
+primers:
+  forward:
+    - fwd_name: SEQUENCE
+  reverse:
+    - rev_name: SEQUENCE
+  trim_settings:
+    min_overlap: 15
+    max_error_rate: 0.1
+    min_length: 100
+
+merge:
+  overlap_ident: 75
+  max_diffs: 1000
+
+filter:
+  max_error_rate: 0.002
+
+uparse:
+  min_size: 2
+
+unoise3:
+  min_size: 8
+
+otutab:
+  ident_threshold: 97
+
+sintax:
+  db: taxonomic_database.fasta.gz
+  db_format: utax
+  confidence: 0.8
+```
+
+If using `snakedeploy`, a simple template will be placed in `config/config.yaml`, which can be modified according to your needs. In the following, we describe the available options.
 
 ## Primers
 
@@ -14,9 +54,11 @@ primers:
     - rev_name: SEQUENCE
 ```
 
+Mixes of primer oligos and multiple primer combinations are possible (see details [below](#all-options)).
+
 ## Sample files
 
-The sample file `config/samples.tsv` has to list all sample files to be processed. You may use [make_sample_tab](https://github.com/markschl/ngs-sample-tab) for this purpose. Example:
+The sample file `config/samples.tsv` contains the paths to all demultiplexed FASTQ files files to be processed. You may use [make_sample_tab](https://github.com/markschl/ngs-sample-tab) for this purpose. Example:
 
 ```sh
 make_sample_tab -d path/to/fastq_files/run1 -f simple
@@ -38,7 +80,7 @@ sample2	path/to/fastq_files/run1/sample2_R1.fastq.gz	path/to/fastq_files/run1/sa
 (...)
 ```
 
-Then, we move the file to `config/samples.tsv`
+We rename the file to `config/samples.tsv`:
 
 ```sh
 mv samples_run1_paired.tsv config/samples.tsv
@@ -56,7 +98,9 @@ The pipeline is configured to use VSEARCH for all steps, but in case of using US
 
 ## All options
 
-In the following, the structure of `config/config.yaml` is shown along with detailed comments. The following sections are mandatory (described below): `primers`, `merge`, `filter`, `otutab`. The following sections are optional: `usearch_binary`, `sample_file`, `uparse`, `unoise3`. *uparse* and *unoise3* are needed if the corresponding target rule is actually run.
+In the following, the structure of `config/config.yaml` is shown along with detailed comments. The following sections are mandatory (described below): `primers`, `merge`, `filter`, `otutab`. The following sections are optional: `usearch_binary`, `sample_file`, `uparse`, `unoise3` and `sintax`.
+
+*uparse*, *unoise3* and *sintax* are needed if the corresponding target rule is actually run.
 
 ```yaml
 defaults:
