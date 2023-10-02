@@ -12,7 +12,9 @@ This [Snakemake](https://snakemake.github.io) workflow aims at providing a simpl
 
 ## Workflow
 
-The workflow follows the [recommendations](https://drive5.com/usearch/manual/uparse_pipeline.html) by the author of USEARCH, but with the addition of trimming primers with Cutadapt and adding some QC. The result will be similar if VSEARCH or USEARCH are used for different steps, even though small differences are to be expected. The UPARSE algorithm is not available in VSEARCH.
+The workflow follows the [recommendations](https://drive5.com/usearch/manual/uparse_pipeline.html) by the author of USEARCH. Primer trimming is done wiwth Cutadapt. 
+
+The results will usually differ slightly depending on whether VSEARCH or USEARCH is used for different steps. The UPARSE algorithm is not available in VSEARCH.
 
 ![workflow](docs/workflow.png)
 
@@ -63,7 +65,7 @@ snakemake --use-conda --cores $cores unoise3 uparse
 Assign taxonomy with SINTAX:
 
 ```sh
-snakemake sintax
+snakemake --use-conda --cores $cores sintax
 ```
 
 This adds some more files with tabular output, as well as taxonomy-annotated BIOM files:
@@ -84,9 +86,9 @@ results/
 
 ## `uvsnake` script
 
-There is a simple script that runs Snakemake with a few default options (to save some typing), but otherwise behaves exactly like Snakemake. It becomes especially useful on clusters (see below).
+There is a simple script that runs Snakemake with a few default options to save some typing, but otherwise behaves exactly like Snakemake. It becomes especially useful on clusters (see below).
 
-With the `snakedeploy` setup described above, we first need to download the script (UNIX):
+We first need to download the script (UNIX):
 
 ```sh
 wget https://raw.githubusercontent.com/markschl/uvsnake/main/uvsnake
@@ -99,7 +101,7 @@ The command looks similar to the `snakemake` command above:
 ./uvsnake --cores $cores unoise3 uparse
 ```
 
-However, it adds a few additional arguments to the `snakemake` call (always printed when executing): `--rerun-incomplete --use-conda --conda-prefix  ~/uvsnake/conda`, and others. These make sure that Conda is always used, and the packages are installed at a common location `<user home>/uvsnake/conda`. 
+Internally, a few additional arguments are added to the `snakemake` call (always printed when executing), the most important being: `--rerun-incomplete --use-conda --conda-prefix  ~/uvsnake/conda`. These make sure that Conda is always used, and the packages are installed at a common location `<user home>/uvsnake/conda`. 
 
 ### Cluster execution
 
@@ -110,7 +112,7 @@ Executing on computer clusters requires [additional settings](https://snakemake.
 It may also make sense to restart failed jobs with `-T/--retries`, in case they failed because of time/memory constraints being too conservative. Here an example running on a SLURM cluster with a total of three tries and a maximum of 100 parallel sample processing jobs:
 
 ```sh
-./uvsnake --slurm --cores all --jobs 100 --retries 3 quality unoise3 uparse
+./uvsnake --slurm --cores all --jobs 10 --retries 3 quality unoise3 uparse
 ```
 
 ## Example
