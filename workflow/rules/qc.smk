@@ -23,7 +23,19 @@ rule fastqc:
         "../envs/qc.yaml"
     shell:
         """
-        fastqc -q -f fastq -t 1 -o {output.outdir} {input} &> {log}
+        exec &> "{log}"
+        fastqc -q -f fastq -t 1 -o {output.outdir} {input:q}
+        # rename output
+        i=1
+        for f in {input:q}; do
+          sample=$(basename $f | sed -E 's/(\.(fq|fastq))?\.gz$//g')
+          orig={output.outdir}/$sample"_fastqc"
+          out="{output.outdir}/{wildcards.sample}"_R"$((i++))"_fastqc
+          if [ "$orig.html" != "$out.html" ]; then
+            mv -f $orig.html $out.html
+            mv -f $orig.zip $out.zip
+          fi
+        done
         """
 
 
