@@ -80,11 +80,11 @@ rule collect_derep:
 
 rule cluster_unoise3:
     params:
-        min_size=config["unoise3"]["min_size"],
-        program=with_default("program", "unoise3"),
+        min_size=lambda _: config["unoise3"]["min_size"],
+        program=lambda _: with_default("program", "unoise3"),
         usearch_bin=config["usearch_binary"],
-        maxaccepts=with_default("maxaccepts", "unoise3"),
-        maxrejects=with_default("maxrejects", "unoise3"),
+        maxaccepts=lambda _: with_default("maxaccepts", "unoise3"),
+        maxrejects=lambda _: with_default("maxrejects", "unoise3"),
     input:
         "workdir/cluster/2_unique_all/{primers}/good_uniques.fasta.zst",
     output:
@@ -100,12 +100,12 @@ rule cluster_unoise3:
     resources:
         mem_mb=unoise3_memfunc(
             with_default("program", "unoise3"),
-            config["unoise3"]["min_size"],
+            nested_cfg(config, "unoise3", "min_size", default=8),
             workflow.cores,
         ),
         runtime=unoise3_timefunc(
             with_default("program", "unoise3"),
-            config["unoise3"]["min_size"],
+            nested_cfg(config, "unoise3", "min_size", default=8),
             with_default("maxrejects", "unoise3"),
             workflow.cores,
         ),
@@ -116,9 +116,9 @@ rule cluster_unoise3:
 rule cluster_uparse:
     params:
         usearch_bin=config["usearch_binary"],
-        min_size=config["uparse"]["min_size"],
-        maxaccepts=with_default("maxaccepts", "uparse"),
-        maxrejects=with_default("maxrejects", "uparse"),
+        min_size=lambda _: config["uparse"]["min_size"],
+        maxaccepts=lambda _: with_default("maxaccepts", "uparse"),
+        maxrejects=lambda _: with_default("maxrejects", "uparse"),
     input:
         "workdir/cluster/2_unique_all/{primers}/good_uniques.fasta.zst",
     output:
@@ -129,9 +129,12 @@ rule cluster_uparse:
     conda:
         "../envs/uvsnake.yaml"
     resources:
-        mem_mb=uparse_memfunc(config["uparse"]["min_size"]),
+        mem_mb=uparse_memfunc(
+            nested_cfg(config, "uparse", "min_size", default=2)
+        ),
         runtime=uparse_timefunc(
-            config["uparse"]["min_size"], with_default("maxaccepts", "uparse")
+            nested_cfg(config, "uparse", "min_size", default=2), 
+            with_default("maxaccepts", "uparse")
         ),
     shell:
         """

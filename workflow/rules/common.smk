@@ -32,17 +32,20 @@ if "sample_file" in config and exists(config["sample_file"]):
 #### Helpers ####
 
 
-def with_default(name, group):
+def with_default(name, group, fallback=None):
     """
     Helper function that obtains a value for program/maxaccepts/maxrejects,
     or the default value from the 'defaults' section.
     This is necessary because validate() does not fill all defaults from the
     JSON schema
     """
-    value = config[group].get(name)
-    if value is None:
-        return config["defaults"][name]
-    return value
+    try:
+        value = config[group].get(name)
+        if value is None:
+            return config["defaults"][name]
+        return value
+    except KeyError:
+        return fallback
 
 
 def expand_clustered(path, **wildcards):
@@ -51,6 +54,19 @@ def expand_clustered(path, **wildcards):
         yield from expand(
             path, primers=parts[1], seqs=parts[2].split(".")[0], **wildcards
         )
+
+
+def nested_cfg(d, *keys, **param):
+    """
+    Get a nested dict entry or default/None if non-existent
+    """
+    if len(keys) == 0:
+        return d
+    try:
+        sub = d[keys[0]]
+        return nested_cfg(sub, *keys[1:], **param)
+    except KeyError:
+        return param.get('default', None)
 
 
 def mem_func(mem=5, f=0, max_mem=50000):
