@@ -51,9 +51,7 @@ def with_default(name, group, fallback=None):
 def expand_clustered(path, **wildcards):
     for f in glob("results/*/*.fasta"):
         parts = f.split(os.sep)
-        yield from expand(
-            path, primers=parts[1], seqs=parts[2].split(".")[0], **wildcards
-        )
+        yield from expand(path, primers=parts[1], seqs=parts[2].split(".")[0], **wildcards)
 
 
 def nested_cfg(d, *keys, **param):
@@ -66,7 +64,7 @@ def nested_cfg(d, *keys, **param):
         sub = d[keys[0]]
         return nested_cfg(sub, *keys[1:], **param)
     except KeyError:
-        return param.get('default', None)
+        return param.get("default", None)
 
 
 def mem_func(mem=5, f=0, max_mem=50000):

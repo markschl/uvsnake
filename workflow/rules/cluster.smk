@@ -129,12 +129,10 @@ rule cluster_uparse:
     conda:
         "../envs/uvsnake.yaml"
     resources:
-        mem_mb=uparse_memfunc(
-            nested_cfg(config, "uparse", "min_size", default=2)
-        ),
+        mem_mb=uparse_memfunc(nested_cfg(config, "uparse", "min_size", default=2)),
         runtime=uparse_timefunc(
-            nested_cfg(config, "uparse", "min_size", default=2), 
-            with_default("maxaccepts", "uparse")
+            nested_cfg(config, "uparse", "min_size", default=2),
+            with_default("maxaccepts", "uparse"),
         ),
     shell:
         """

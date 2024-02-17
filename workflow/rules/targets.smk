@@ -64,5 +64,5 @@ rule sintax:
                 "sintax.biom.gz",
                 "sintax.fasta.gz",
             ],
-            **wildcards
+            **wildcards,
         ),
