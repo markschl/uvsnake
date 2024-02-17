@@ -12,6 +12,12 @@ except ImportError:
           "Alternatively, you may install Snakemake system-wide.", file=sys.stderr)
     exit(1)
 
+try:
+    from snakemake import main as snakemake_main
+except ImportError:
+    # Snakemake version >= 8.0
+    from snakemake.cli import main as snakemake_main
+
 
 def main(argv = sys.argv[1:]):
 
@@ -86,7 +92,7 @@ def main(argv = sys.argv[1:]):
 
     # Finally, we can run Snakemake
     print("Running: snakemake " + " ".join(cmd), file=sys.stderr)
-    snakemake.main(cmd)
+    snakemake_main(cmd)
 
 
 if __name__ == '__main__':
