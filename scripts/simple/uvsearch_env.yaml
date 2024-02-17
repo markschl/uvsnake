@@ -3,5 +3,5 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - vsearch=2.21
-  - cutadapt=4.1
+  - vsearch=2.27
+  - cutadapt=4.6
