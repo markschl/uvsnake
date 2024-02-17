@@ -22,7 +22,7 @@ rule fastqc:
     conda:
         "../envs/qc.yaml"
     shell:
-        """
+        r"""
         exec &> "{log}"
         fastqc -q -f fastq -t 1 -o {output.outdir} {input:q}
         # rename output
