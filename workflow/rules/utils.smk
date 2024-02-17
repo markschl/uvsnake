@@ -38,30 +38,25 @@ class SampleList(object):
             self.header = next(rdr)
             self.ncol = len(self.header)
             if self.ncol == 3:
-                assert (
-                    self.header == self.default_header["paired"]
-                    or self.header == self.qiime_header["paired"]
-                ), (
-                    "Unknown paired-end sample file header: {}. " "Valid are {} or {}"
-                ).format(
-                    self.header, self.header["single"], self.qiime_header["single"]
-                )
                 self.layout = "paired"
+            elif self.ncol == 1:
+                self.layout = "single"
             else:
-                assert self.ncol == 2, (
+                raise AssertionError(
                     "Invalid number of columns in sample file. "
                     "Either two (single-end) or three (paired-end) are expected"
                 )
-                assert (
-                    self.header == self.header["single"]
-                    or self.header == self.qiime_header["single"]
-                ), (
-                    "Unknown paired-end sample file header: {}. " "Valid are {} or {}"
-                ).format(
-                    self.header, self.header["single"], self.qiime_header["single"]
-                )
-                self.layout = "single"
-
+            assert (
+                self.header == self.default_header[self.layout]
+                or self.header == self.qiime_header[self.layout]
+            ), (
+                "Unknown {}-end sample file header: '{}'. " "Valid are '{}' or '{}'"
+            ).format(
+                self.layout,
+                ",".join(self.header),
+                ",".join(self.default_header[self.layout]),
+                ",".join(self.qiime_header[self.layout]),
+            )
             for row in rdr:
                 self.add(row[0], row[1:])
 
