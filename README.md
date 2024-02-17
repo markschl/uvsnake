@@ -1,26 +1,26 @@
 # USEARCH/VSEARCH-based pipeline for amplicon data processing
 
-This [Snakemake](https://snakemake.github.io) workflow aims at providing a simple way for clustering/denoising paired-end Illumina sequences with [USEARCH](https://drive5.com/usearch) and/or [VSEARCH](https://github.com/torognes/vsearch).
+This [Snakemake](https://snakemake.github.io) workflow aims at providing a simple way for clustering/denoising paired-end Illumina sequences with **[USEARCH](https://drive5.com/usearch)** and/or **[VSEARCH](https://github.com/torognes/vsearch)**.
 
 ## Features
 
-* *Standard pipeline*: Paired-end read merging, primer trimming, UNOISE3/UPARSE clustering and SINTAX taxonomy assignment
-* Both USEARCH and VSEARCH can be used (configurable individually at every step)
-* *Multiple primer combinations* can be recognized using [Cutadapt](https://cutadapt.readthedocs.io), and subsequent clustering/taxonomy assignment is done separately for every amplicon
-* Quality control using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc) and [MultiQC](https://multiqc.info)
-* Optimized for large projects with many samples (samples are *processed in parallel*, beneficial if running on a cluster)
+* Paired-end read merging, primer trimming, [**UNOISE3**](https://doi.org/10.1101/081257) and/or [**UPARSE**](https://doi.org/10.1038/nmeth.2604) clustering and [**SINTAX**](https://doi.org/10.1101/074161) taxonomy assignment
+* Both **USEARCH** and **VSEARCH** can be used (configurable individually at every step, default is USEARCH). Exception: VSEARCH is always used for steps where it does not matter since the two tools behave the same (de-replication, quality filtering).
+* **Multiple amplicons** can be recognized by first matching different forward and reverse primers, and subsequently doing the clustering/taxonomy assignment steps separately for every primer combination
+* **Quality control** using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc) and [MultiQC](https://multiqc.info)
+* **Parallel sample processing**: Read merging, primer trimming and quality filtering steps can be done invididually for every sample, allowing fast parallel processing (e.g. on a cluster) even for very large datasets.
 
 ## Workflow
 
-The workflow follows the [recommendations](https://drive5.com/usearch/manual/uparse_pipeline.html) by the author of USEARCH. Primer trimming is done wiwth Cutadapt. 
+The workflow follows the [recommendations](https://drive5.com/usearch/manual/uparse_pipeline.html) by the author of USEARCH. Primer trimming is done with the popular tool [Cutadapt](https://cutadapt.readthedocs.io/en/stable/guide.html). 
 
-The results will usually differ slightly depending on whether VSEARCH or USEARCH is used for different steps. The UPARSE algorithm is not available in VSEARCH.
+The results usually differ slightly depending on whether VSEARCH or USEARCH is used for different steps. The UPARSE algorithm is not available in VSEARCH.
 
 ![workflow](docs/workflow.png)
 
 ## Installation (UNIX)
 
-The following approach assumes [Mamba](https://github.com/mamba-org/mamba) to be installed as the Conda package manager:
+The following approach assumes Mamba from the [Miniforge conda distribution](https://github.com/conda-forge/miniforge). If using others (e.g. Miniconda), just use *conda* instead of *mamba*.
 
 ```sh
 # install Snakemake
@@ -36,7 +36,7 @@ snakedeploy deploy-workflow https://github.com/markschl/uvsnake . --tag v0.1
 
 ## Configuration
 
-After initialization, a `config` directory is found in the project directory. It contains `config.yaml` and `samples.tsv`, which both have to be adjusted to your needs (see illustration). More details on the configuration and how to easily create a sample file [are found here](config):
+After initialization, a `config` directory is found within the project directory. It contains `config.yaml` and `samples.tsv`, which should both be adjusted to the specific needs of the project (see illustration). More details on the configuration and how to create a samples list [are found here](config):
 
 ![input](docs/config.png)
 
@@ -86,7 +86,7 @@ results/
 
 ## `uvsnake` script
 
-There is a simple script that runs Snakemake with a few default options to save some typing, but otherwise behaves exactly like Snakemake. It becomes especially useful on clusters (see below).
+There is a simple script that runs Snakemake with a few default options to save some typing, but otherwise *behaves exactly like Snakemake*. It becomes especially useful on clusters (see below).
 
 We first need to download the script (UNIX):
 
@@ -105,7 +105,7 @@ Internally, a few additional arguments are added to the `snakemake` call (always
 
 ### Cluster execution
 
-Executing on computer clusters requires [additional settings](https://snakemake.readthedocs.io/en/stable/executing/cluster.html). Here, using the `uvsnake` script (previous chapter) is a good idea, since it assists with setting resource constraints on computer clusters and grouping small sample processing jobs into batches. The latter is important because submitting every single sample processing step as job is very inefficient.
+Running the pipeline on computer clusters requires [additional settings](https://snakemake.readthedocs.io/en/stable/tutorial/additional_features.html#cluster-execution). Using the `uvsnake` script is highly recommended, since it assists with setting resource constraints and grouping small sample processing jobs into batches. Otherwise, Snakemake would submit every single sample processing step as separate job, which is very inefficient.
 
  *Note*: an altenative would be to use [profiles](https://snakemake.readthedocs.io/en/latest/executing/cli.html#profiles), see [this example](https://github.com/jdblischak/smk-simple-slurm/blob/main/examples/job-grouping/simple/config.yaml). This may be better documented in the future.
 

@@ -44,7 +44,7 @@ cat $taxonomy |
   sed -E 's/;sh__.*//g' `# remove 'sh' rank` \
   > unite/tax.txt
 
-# Subsequently, we use https://github.com/markschl/seqtool to add the taxonomy to the
+# Subsequently, we use https://github.com/markschl/seqtool v0.3 to add the taxonomy to the
 # FASTA headers.
 # Also, in this case we remove (potentially) poorly annotated sequences,
 # which have no known order name
@@ -81,7 +81,7 @@ conda activate snakemake
 
 # We may also compare the results with the expected sequences using
 # VSEARCH -usearch_global
-# This allows us to match the known isolates with the observed OTUs
+# This allows us to match the known isolates in the communities with the observed OTUs
 out=mock_example/results/ITS3-KYO2...ITS4
 vsearch --usearch_global $out/unoise3.fasta \
   --db mock_example/mock/mock_ITS2.fasta \

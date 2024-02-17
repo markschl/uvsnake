@@ -40,11 +40,11 @@ sintax:
   confidence: 0.8
 ```
 
-If using `snakedeploy`, a simple template will be placed in `config/config.yaml`, which can be modified according to your needs. In the following, we describe the available options.
+The command `snakedeploy deploy-workflow https://github.com/markschl/uvsnake . --tag v0.1` will copy a simple configuration template to `config/config.yaml`. All its sections can be modified according to your needs. In the following, we describe the available options.
 
 ## Primers
 
-As a minimum, the `primers` section needs to contain the correct primer sequences:
+The `primers` section needs to contain the correct primer sequences:
 
 ```yaml
 primers:
@@ -58,13 +58,13 @@ Mixes of primer oligos and multiple primer combinations are possible (see detail
 
 ## Sample files
 
-The sample file `config/samples.tsv` contains the paths to all demultiplexed FASTQ files files to be processed. You may use [make_sample_tab](https://github.com/markschl/ngs-sample-tab) for this purpose. Example:
+The sample file `config/samples.tsv` should contain a list of paths of all demultiplexed FASTQ files files to be processed. In the following, we use the tool [make_sample_tab](https://github.com/markschl/ngs-sample-tab), which was created exactly for this purpose:
 
 ```sh
 make_sample_tab -d path/to/fastq_files/run1 -f simple
 ```
 
-The message indicates that paired-end Illumina reads were found:
+The message indicates that paired-end Illumina reads were found in the `run1` directory:
 
 ```
 Automatically inferred sample pattern: 'illumina'

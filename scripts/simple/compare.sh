@@ -82,7 +82,7 @@ scripts/simple/usearch.sh $uout mock_example/config/config.yaml file:$fprimers f
 # Here we compare just the sorted sequences and OTU counts. Small differences are still
 # not a 100% proof for a bug in our code.
 #
-# Needs 'seqtool' is installed
+# Needs 'seqtool' installed
 sort_seqs() {
   st . --to-tsv seq $1 | sort
 }
