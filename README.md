@@ -109,11 +109,13 @@ Running the pipeline on computer clusters requires [additional settings](https:/
 
  *Note*: an altenative would be to use [profiles](https://snakemake.readthedocs.io/en/latest/executing/cli.html#profiles), see [this example](https://github.com/jdblischak/smk-simple-slurm/blob/main/examples/job-grouping/simple/config.yaml). This may be better documented in the future.
 
-It may also make sense to restart failed jobs with `-T/--retries`, in case they failed because of time/memory constraints being too conservative. Here an example running on a SLURM cluster with a total of three tries and a maximum of 100 parallel sample processing jobs:
+Example running on a [SLURM cluster](https://anaconda.org/bioconda/snakemake-executor-plugin-slurm) with a maximum of 100 parallel sample processing jobs:
 
 ```sh
-./uvsnake --slurm --cores all --jobs 10 --retries 3 quality unoise3 uparse
+./uvsnake --executor slurm --cores all --jobs 100 --retries 3 quality unoise3 uparse
 ```
+
+The pipeline sets the job memory and time constraints individually for every step depending on the size of the input data. In rare cases, the limits may be too narrow, therefore it is a good idea to supply `-T/--retries` to restart failed jobs.
 
 ## Example
 
