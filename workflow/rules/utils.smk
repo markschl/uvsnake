@@ -39,7 +39,7 @@ class SampleList(object):
             self.ncol = len(self.header)
             if self.ncol == 3:
                 self.layout = "paired"
-            elif self.ncol == 1:
+            elif self.ncol == 2:
                 self.layout = "single"
             else:
                 raise AssertionError(
