@@ -40,7 +40,7 @@ sintax:
   confidence: 0.8
 ```
 
-The command `snakedeploy deploy-workflow https://github.com/markschl/uvsnake . --tag v0.1` will copy a simple configuration template to `config/config.yaml`. All its sections can be modified according to your needs. In the following, we describe the available options.
+The command `snakedeploy deploy-workflow https://github.com/markschl/uvsnake . --tag v0.1.1` will copy a simple configuration template to `config/config.yaml`. All its sections can be modified according to your needs. In the following, we describe the available options.
 
 ## Primers
 
