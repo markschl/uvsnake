@@ -1,16 +1,23 @@
 exec &>"${snakemake_log[0]}"
 set -xeuo pipefail
 
-if [[ "${snakemake_params[program]}" == "vsearch" ]]; then
-    # prepare optional parameters
-    extra=""
-    sam="${snakemake_params[bam_out]%.*}.sam"
-    mkdir -p $(dirname $sam)
-    if [ "${snakemake_params[extra]}" = "true" ]; then
-        extra="--samout $sam --userout ${snakemake_output[map_out]%.gz} -userfields query+target+id -maxhits 1"
+# prepare optional output
+extra=
+map_out=
+sam_out=
+for f in ${snakemake_output[extra]}; do
+    if [[ "$f" == *_search.txt.gz ]]; then
+        map_out="${f%.gz}"
+        extra="$extra --userout $map_out -userfields query+target+id -maxhits 1"
     fi
+    if [[ "$f" == *.sam ]]; then
+        sam_out="$f"
+        extra="$extra --samout $f"
+    fi
+done
 
-    # run the search
+# run the search
+if [[ "${snakemake_params[program]}" == "vsearch" ]]; then
     # Parameter differences to USEARCH: --strand plus --sizein
     # -otutab already assumes -strand plus and will fail without size annotations
     # https://www.drive5.com/usearch/manual/cmd_otutab.html
@@ -30,15 +37,6 @@ if [[ "${snakemake_params[program]}" == "vsearch" ]]; then
             --threads ${snakemake[threads]} \
             $extra
 
-    # SAM > BAM
-    if [ -s "$sam" ]; then
-        rm -f "${snakemake_input[otus]}".fai "${snakemake_params[bam_out]}".bai
-        samtools view -T "${snakemake_input[otus]}" -b "$sam" |
-            samtools sort -@ ${snakemake[threads]} >"${snakemake_params[bam_out]}"
-        rm "$sam" "${snakemake_input[otus]}".fai
-        samtools index "${snakemake_params[bam_out]}"
-    fi
-
 elif [[ "${snakemake_params[program]}" == "usearch" ]]; then
     uniques=$(mktemp "${snakemake_input[uniques]%.*.*}".XXXXXX.fasta)
     zstd -dqf "${snakemake_input[uniques]}" -o "$uniques"
@@ -51,6 +49,7 @@ elif [[ "${snakemake_params[program]}" == "usearch" ]]; then
         -otutabout "${snakemake_output[tab]%.gz}" \
         -notmatched "${snakemake_output[notmatched]%.zst}" \
         -threads ${snakemake[threads]} \
+        $extra \
         1>&2
     # -biomout "${snakemake_output[biom]}" \
     rm "$uniques"
@@ -75,6 +74,6 @@ fi
 gzip -n "${snakemake_output[tab]%.gz}"
 zstd --rm -qf "${snakemake_output[notmatched]%.zst}"
 
-if [ "${snakemake_params[extra]}" = "true" ]; then
-    "${snakemake_output[map_out]%.gz}"
+if [[ -n "$map_out" ]]; then
+    gzip -f "$map_out"
 fi

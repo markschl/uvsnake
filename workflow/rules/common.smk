@@ -48,6 +48,20 @@ def with_default(name, group, fallback=None):
         return fallback
 
 
+def otutab_extra_files(bam, **wildcards):
+    out = []
+    if config["otutab"].get("extra", False):
+        prefix = expand("workdir/cluster/4_otutab/{primers}/{what}", allow_missing=True, **wildcards)[0]
+        out.append(prefix + "_search.txt.gz")
+        if cfg_or_global_default("otutab", "program") == "vsearch":
+            if bam:
+                out.append(prefix + ".bam")
+                out.append(prefix + ".bam.bai")
+            else:
+                out.append(temp(prefix + ".sam"))
+    return out
+
+
 def expand_clustered(path, **wildcards):
     for f in glob("results/*/*.fasta"):
         parts = f.split(os.sep)

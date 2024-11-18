@@ -167,6 +167,7 @@ rule usearch_make_otutab:
         tab="results/{primers}/{what}_otutab.txt.gz",
         biom="results/{primers}/{what}.biom",
         notmatched="workdir/cluster/4_otutab/{primers}/{what}_otutab_notmatched.fasta.zst",
+        extra=otutab_extra_files(bam=False),
     threads: workflow.cores
     log:
         "logs/cluster/4_otutab/{primers}_{what}.log",
@@ -182,6 +183,32 @@ rule usearch_make_otutab:
         ),
     script:
         "../scripts/make_otutab.sh"
+
+
+rule otutab_sam2bam:
+    input:
+        otus="results/{primers}/{what}.fasta",
+        sam="workdir/cluster/4_otutab/{primers}/{what}.sam",
+    output:
+        bam="workdir/cluster/4_otutab/{primers}/{what}.bam",
+        bai="workdir/cluster/4_otutab/{primers}/{what}.bam.bai",
+    log:
+        "logs/cluster/4_otutab/{primers}_{what}_sam2bam.log",
+    conda:
+        "../envs/samtools.yaml"
+    threads:
+        workflow.cores,
+    resources:
+        mem_mb=mem_func(100, 2),
+        runtime=time_func(10, 0.05 / workflow.cores),
+    shell:
+        """
+        rm -f "{input.otus}".fai
+        samtools view -T "{input.otus}" -b "{input.sam}" |
+            samtools sort -m {resources.mem_mb}M -@ {threads} >{output.bam}
+        rm -f "{input.otus}".fai
+        samtools index "{output.bam}"
+        """
 
 
 # rule post_cluster:

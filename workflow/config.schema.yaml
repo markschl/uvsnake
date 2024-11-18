@@ -154,6 +154,13 @@ properties:
       extra:
         type: boolean
         default: false
+        description:
+          (boolean) Creates additional diagnostic output files;
+          (1) a mapping with three columns (read name, Zotu name, percent identity)
+          deposited in workdir/cluster/4_otutab/<primers>/<unoise3/uparse>_search.txt.gz,
+          and
+          (2) in case of using VSEARCH a BAM file that allows inspecting the
+          mapped reads.
       program: { $ref: "#/properties/defaults/properties/program" }
       maxaccepts: { $ref: "#/properties/defaults/properties/maxaccepts" }
       maxrejects: { $ref: "#/properties/defaults/properties/maxrejects" }

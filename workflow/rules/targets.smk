@@ -24,8 +24,9 @@ rule unoise3:
         expand(
             "results/{primers}/{what}",
             primers=config["_primer_combinations"],
-            what=["unoise3.fasta", "unoise3_otutab.txt.gz", "unoise3.biom"],
+            what=["unoise3.fasta", "unoise3_otutab.txt.gz", "unoise3.biom"]
         ),
+        otutab_extra_files(bam=True, primers=config["_primer_combinations"], what="unoise3"),
         rules.stats.output,
         expand(rules.combine_logs.output, method="unoise3"),
 
@@ -38,6 +39,7 @@ rule uparse:
             primers=config["_primer_combinations"],
             what=["uparse.fasta", "uparse_otutab.txt.gz", "uparse.biom"],
         ),
+        otutab_extra_files(bam=True, primers=config["_primer_combinations"], what="uparse"),
         rules.stats.output,
         expand(rules.combine_logs.output, method="uparse"),
 
