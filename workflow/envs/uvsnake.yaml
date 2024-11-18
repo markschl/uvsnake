@@ -1,6 +1,7 @@
 dependencies:
   - python >=3.6
   - vsearch=2.29
+  - usearch=12.0_beta
   - zstd=1.5
   - cutadapt=4.9
   - biom-format=2.1

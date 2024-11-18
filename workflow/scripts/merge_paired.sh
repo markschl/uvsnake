@@ -49,7 +49,7 @@ output=$(
 
 # output stats file based on parsing of intercepted usearch output
 # (fortunately, the output of USEARCH and VSEARCH is similar enough for a common parsing routine)
-n=$(grep " Pairs" <<<"$output" | sed -E 's/ *([0-9]+) *Pairs.*/\1/g')
+n=$(grep -Ei "[0-9]+ +(read )?pairs" <<<"$output" | sed -E 's/ *([0-9]+) *(read )?pairs.*/\1/ig')
 n_merged=$(grep " Merged" <<<"$output" | sed -E 's/ *([0-9]+) *Merged.*/\1/g')
 printf "$n\t$n_merged" >"${snakemake_output[stats]}"
 

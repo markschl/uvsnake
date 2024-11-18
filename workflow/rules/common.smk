@@ -32,20 +32,40 @@ if "sample_file" in config and exists(config["sample_file"]):
 #### Helpers ####
 
 
-def with_default(name, group, fallback=None):
+def cfg_path(*keys, default=None):
+    """
+    Get a nested dict entry or default if non-existent
+    """
+    return _cfg_path(config, *keys)
+
+
+def _cfg_path(cfg, *keys, default=None):
+    if len(keys) == 0:
+        return cfg
+    try:
+        sub = cfg[keys[0]]
+        return _cfg_path(sub, *keys[1:])
+    except KeyError:
+        return default
+
+
+def cfg_or_global_default(*keys, fallback=None):
     """
     Helper function that obtains a value for program/maxaccepts/maxrejects,
     or the default value from the 'defaults' section.
     This is necessary because validate() does not fill all defaults from the
     JSON schema
     """
-    try:
-        value = config[group].get(name)
-        if value is None:
-            return config["defaults"][name]
-        return value
-    except KeyError:
-        return fallback
+    value = cfg_path(*keys, default=fallback)
+    if value is fallback:
+        value = config["defaults"].get(keys[-1], fallback)
+        assert not value is fallback, "No fallback setting for '{}' in 'defaults' section".format(keys[-1])
+    return value
+
+
+def usearch_bin():
+    return config.get("usearch_binary", "usearch")
+
 
 
 def otutab_extra_files(bam, **wildcards):
@@ -66,19 +86,6 @@ def expand_clustered(path, **wildcards):
     for f in glob("results/*/*.fasta"):
         parts = f.split(os.sep)
         yield from expand(path, primers=parts[1], seqs=parts[2].split(".")[0], **wildcards)
-
-
-def nested_cfg(d, *keys, **param):
-    """
-    Get a nested dict entry or default/None if non-existent
-    """
-    if len(keys) == 0:
-        return d
-    try:
-        sub = d[keys[0]]
-        return nested_cfg(sub, *keys[1:], **param)
-    except KeyError:
-        return param.get("default", None)
 
 
 def mem_func(mem=5, f=0, max_mem=50000):

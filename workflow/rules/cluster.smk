@@ -81,10 +81,10 @@ rule collect_derep:
 rule cluster_unoise3:
     params:
         min_size=lambda _: config["unoise3"]["min_size"],
-        program=lambda _: with_default("program", "unoise3"),
-        usearch_bin=config["usearch_binary"],
-        maxaccepts=lambda _: with_default("maxaccepts", "unoise3"),
-        maxrejects=lambda _: with_default("maxrejects", "unoise3"),
+        program=lambda _: cfg_or_global_default("unoise3", "program"),
+        usearch_bin=usearch_bin(),
+        maxaccepts=lambda _: cfg_or_global_default("unoise3", "maxaccepts"),
+        maxrejects=lambda _: cfg_or_global_default("unoise3", "maxrejects"),
     input:
         "workdir/cluster/2_unique_all/{primers}/good_uniques.fasta.zst",
     output:
@@ -99,14 +99,14 @@ rule cluster_unoise3:
     threads: workflow.cores if with_default("program", "unoise3") == "vsearch" else 1
     resources:
         mem_mb=unoise3_memfunc(
-            with_default("program", "unoise3"),
-            nested_cfg(config, "unoise3", "min_size", default=8),
+            cfg_or_global_default("unoise3", "program"),
+            cfg_path("unoise3", "min_size", default=8),
             workflow.cores,
         ),
         runtime=unoise3_timefunc(
-            with_default("program", "unoise3"),
-            nested_cfg(config, "unoise3", "min_size", default=8),
-            with_default("maxrejects", "unoise3"),
+            cfg_or_global_default("unoise3", "program"),
+            cfg_path("unoise3", "min_size", default=8),
+            cfg_or_global_default("unoise3", "maxrejects"),
             workflow.cores,
         ),
     script:
@@ -115,10 +115,10 @@ rule cluster_unoise3:
 
 rule cluster_uparse:
     params:
-        usearch_bin=config["usearch_binary"],
+        usearch_bin=usearch_bin(),
         min_size=lambda _: config["uparse"]["min_size"],
-        maxaccepts=lambda _: with_default("maxaccepts", "uparse"),
-        maxrejects=lambda _: with_default("maxrejects", "uparse"),
+        maxaccepts=lambda _: cfg_or_global_default("uparse", "maxaccepts"),
+        maxrejects=lambda _: cfg_or_global_default("uparse", "maxrejects"),
     input:
         "workdir/cluster/2_unique_all/{primers}/good_uniques.fasta.zst",
     output:
@@ -129,10 +129,10 @@ rule cluster_uparse:
     conda:
         "../envs/uvsnake.yaml"
     resources:
-        mem_mb=uparse_memfunc(nested_cfg(config, "uparse", "min_size", default=2)),
+        mem_mb=uparse_memfunc(cfg_path("uparse", "min_size", default=2)),
         runtime=uparse_timefunc(
-            nested_cfg(config, "uparse", "min_size", default=2),
-            with_default("maxaccepts", "uparse"),
+            cfg_path("uparse", "min_size", default=2),
+            cfg_or_global_default("uparse", "maxaccepts"),
         ),
     shell:
         """
@@ -152,14 +152,14 @@ rule cluster_uparse:
 rule usearch_make_otutab:
     params:
         ident_threshold=config["otutab"]["ident_threshold"] / 100,
-        program=with_default("program", "otutab"),
-        usearch_bin=config["usearch_binary"],
-        maxaccepts=with_default("maxaccepts", "otutab"),
-        maxrejects=with_default("maxrejects", "otutab"),
         # optional diagnostic output
         extra="true" if config["otutab"].get("extra", False) else "false",
         bam_out="workdir/cluster/4_otutab/{primers}/{what}.bam",
         map_out="workdir/cluster/4_otutab/{primers}/{what}_search.txt.gz",
+        program=cfg_or_global_default("otutab", "program"),
+        usearch_bin=usearch_bin(),
+        maxaccepts=cfg_or_global_default("otutab", "maxaccepts"),
+        maxrejects=cfg_or_global_default("otutab", "maxrejects"),
     input:
         otus="results/{primers}/{what}.fasta",
         uniques="workdir/cluster/2_unique_all/{primers}/all_uniques.fasta.zst",
@@ -174,11 +174,11 @@ rule usearch_make_otutab:
     conda:
         "../envs/uvsnake.yaml"
     resources:
-        mem_mb=otutab_memfunc(with_default("program", "otutab"), workflow.cores),
+        mem_mb=otutab_memfunc(cfg_or_global_default("otutab", "program"), workflow.cores),
         runtime=otutab_timefunc(
-            with_default("program", "otutab"),
-            with_default("maxaccepts", "otutab"),
-            with_default("maxrejects", "otutab"),
+            cfg_or_global_default("otutab", "program"),
+            cfg_or_global_default("otutab", "maxaccepts", fallback=1),
+            cfg_or_global_default("otutab", "maxrejects", fallback=1),
             workflow.cores,
         ),
     script:
@@ -214,10 +214,10 @@ rule otutab_sam2bam:
 # rule post_cluster:
 #     params:
 #         threshold=config["post_cluster"]["ident_threshold"]/100,
-#         program=with_default("program", "post_cluster"),
-#         usearch_bin=config["usearch_binary"],
-#         maxaccepts=with_default("maxaccepts", "post_cluster"),
-#         maxrejects=with_default("maxrejects", "post_cluster"),
+#         program=cfg_or_global_default("post_cluster", "program"),
+#         usearch_bin=usearch_bin(),
+#         maxaccepts=cfg_or_global_default("post_cluster", "maxaccepts"),
+#         maxrejects=cfg_or_global_default("post_cluster", "maxrejects"),
 #     input:
 #         seqs="results/{primers}/unoise3.fasta",
 #         biom="results/{primers}/unoise3.biom",
@@ -231,6 +231,6 @@ rule otutab_sam2bam:
 #     group:
 #         "cluster"
 #     threads:
-#         int(workflow.cores * 1.5) if with_default("program", "post_cluster") == "vsearch" else 1
+#         int(workflow.cores * 1.5) if cfg_or_global_default("post_cluster", "program") == "vsearch" else 1
 #     script:
 #         "../scripts/post_cluster.py"

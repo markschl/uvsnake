@@ -20,13 +20,10 @@ properties:
 
   usearch_binary:
     type: string
-    default: usearch
     description:
-        USEARCH binary name/path (download from https://drive5.com/usearch).
-        The default is 'usearch', assuming that the program is accessible
-        in $PATH. Alternatively, an absolute or relative path
-        (relative to analysis directory containing 'config') can be
-        specified.
+        Path to a custom USEARCH binary that should be used instead
+        of the open-sourced v12 beta (download from https://drive5.com/usearch,
+        respectively https://github.com/rcedgar/usearch_old_binaries).
 
   sample_file:
     type: string

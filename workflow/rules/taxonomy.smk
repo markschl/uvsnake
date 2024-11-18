@@ -36,10 +36,8 @@ rule assign_taxonomy_sintax:
         "taxonomy"
     conda:
         "../envs/uvsnake.yaml"
-    # threads:
-    # VSEARCH works in parallel (although cores seem to be used only ~50%) while
-    # USEARCH v11 does not appear to use more than 1 thread
-    threads: lambda _: workflow.cores if with_default("program", "sintax") == "vsearch" else 1
+    # VSEARCH works in parallel, while USEARCH v11/v12 does not appear to use more than 1 thread
+    threads: lambda _: workflow.cores if cfg_or_global_default("sintax", "program") == "vsearch" else 1
     resources:
         mem_mb=5000,
         runtime=240,
