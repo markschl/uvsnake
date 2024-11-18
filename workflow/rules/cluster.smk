@@ -149,7 +149,7 @@ rule cluster_uparse:
         """
 
 
-rule usearch_make_otutab:
+rule make_otutab:
     params:
         ident_threshold=config["otutab"]["ident_threshold"] / 100,
         program=cfg_or_global_default("otutab", "program"),
