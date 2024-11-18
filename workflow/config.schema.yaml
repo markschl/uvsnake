@@ -74,13 +74,9 @@ properties:
                     type: string
               minItems: 1
             combinations:
-              oneOf:
-                - { type: string, enum: [all] }
-                - 
-                  type: array
-                  items: { type: string }
-                  minItems: 1
-              default: all
+              type: array
+              items: { type: string }
+              minItems: 1
           required: [forward, reverse]
           additionalProperties: false
       minProperties: 1

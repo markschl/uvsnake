@@ -54,7 +54,59 @@ primers:
     - rev_name: SEQUENCE
 ```
 
-Mixes of primer oligos and multiple primer combinations are possible (see details [below](#all-options)).
+Mixes of primer oligos and multiple primer combinations are possible, in which case all possible combinations are searched (see also [below](#all-options)):
+
+```yaml
+primers:
+  forward:
+    - fwd_1: SEQUENCE
+    - fwd_2: SEQUENCE
+  reverse:
+    - rev_1: SEQUENCE
+    - rev_2: SEQUENCE
+```
+
+To restrict the combinations, use `combinations`, with the names separated by `...`:
+
+```yaml
+primers:
+  (...)
+  combinations:
+    - fwd_1...rev_1
+    - fwd_2...rev_2
+```
+
+### Anchoring
+
+To make sure that primers are only recognized at the start of the sequence, insert the anchoring symbol *`^`* at the start: `^SEQUENCE` (for both forward and reverse primers). This can be especially useful if different primers were used to amplify overlapping portions of the same locus, an therefore some primer sequences may be wrongly recognized at some internal position.
+
+With anchoring, base insertions or deletions at the start are still possible up to the given error rate (`max_error_rate` setting) (see also [Cutadapt documentation](https://cutadapt.readthedocs.io/en/stable/guide.html#anchored-5adapters)).
+
+
+### Primer mixes
+
+Forward and/or reverse primers may actually be mixes of multiple oligos, which can be represented as a comma-delimited list: `SEQUENCE1, SEQUENCE2, ...`.
+
+Possible use cases:
+
+- making sure that specific taxonomic groups are well amplified, but adding degeneracies would introduce too many unnecessary primer sequence variants
+- phased nucleotide inserts to increase nucleotide diversity for improved Illumina sequence quality
+
+Specifying all phased primer variants is not actually necessary, unless [anchoring](#anchoring) is used. If anchoring, specify the anchoring symbol only once at the start. Example:
+
+```yaml
+primers:
+  forward:
+    - phased_primer: 
+       ^   PRIMER,
+          NPRIMER,
+         NNPRIMER,
+        NNNPRIMER
+  (...)
+```
+
+> Note: spaces and line breaks are optional but can be useful for clarity
+
 
 ## Sample files
 

@@ -11,30 +11,41 @@ def parse_primer(primer_dict):
     anchor = False
     if seqs.startswith("^"):
         anchor = True
-        seqs = seqs[1:]
+        seqs = seqs[1:].strip()
+        assert not seqs.startswith("^"), "The anchoring symbol '^' cannot be repeated"
     seqs = [s.strip() for s in seqs.split(",")]
-    return {"name": name, "sequences": seqs, "anchor": anchor}
+    assert not any(s.startswith("^") for s in seqs[1:]), (
+        "Primer {}: The anchoring symbol '^' can only be used at the start of a "
+        "comma-delimited oligo list. Configuring anchoring for mixed oligos "
+        "individually is not possible."
+    ).format(name)
+
+    return name, seqs, anchor
 
 
-def get_primer_combinations(config):
-    primers = {"forward": [], "reverse": [], "reverse_rev": []}
+def get_primer_combinations(primer_cfg):
+    from itertools import product
+    from copy import copy
+
+    primers = {"forward": {}, "reverse": {}, "reverse_rev": {}}
     for direction in ["forward", "reverse"]:
-        for p in config["primers"][direction]:
-            primers[direction].append(parse_primer(p))
+        for p in primer_cfg[direction]:
+            name, seqs, anchor = parse_primer(p)
+            primers[direction][name] = (seqs, anchor)
 
     # reverse complement reverse sequences
-    r_rev = primers["reverse_rev"] = []
-    for p in primers["reverse"]:
-        p = copy.copy(p)
-        p["sequences"] = [reverse_complement(seq) for seq in p["sequences"]]
-        r_rev.append(p)
+    r_rev = primers["reverse_rev"]
+    for name, p in primers["reverse"].items():
+        seqs, anchor = p
+        seqs = [reverse_complement(seq) for seq in seqs]
+        r_rev[name] = (seqs, anchor)
 
-    # obtain primer combinations
-    combinations = primers.get("combinations", "default")
-    if combinations == "default":
+    # parse primer combinations
+    combinations = primer_cfg.get("combinations", None)
+    if combinations is None:
         combinations = []
         for fwd, rev in product(primers["forward"], primers["reverse"]):
-            combinations.append("{}...{}".format(fwd["name"], rev["name"]))
+            combinations.append("{}...{}".format(fwd, rev))
     else:
         assert isinstance(combinations, list)
         for c in combinations:
@@ -48,11 +59,12 @@ def get_primer_combinations(config):
     return primers, combinations
 
 
-# initialize samples if corresponding sections present in configuration
+# Initialize primers, taxonomy and input samples if corresponding sections 
+# present in configuration
 # (otherwise we assume that uvsnake is used as Snakemake module and not all
 # functionality may be needed)
 if "primers" in config:
-    config["_primers"], config["_primer_combinations"] = get_primer_combinations(config)
+    config["_primers"], config["_primer_combinations"] = get_primer_combinations(config["primers"])
 
 if "sample_file" in config and exists(config["sample_file"]):
     # further add these settings to config (_underscore indicates that they are special)

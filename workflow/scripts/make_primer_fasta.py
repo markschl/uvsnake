@@ -1,14 +1,24 @@
 
 from contextlib import contextmanager
 import sys
+import re
 
 
 def _make_fasta(primers, outfile, add_anchor):
     with open(outfile, 'w') as f:
-        for d in primers:
-            name = d["name"]
-            for s in d['sequences']:
-                if d['anchor']:
+        for name, p in primers.items():
+            seqs, anchor = p
+            assert re.search(r"\s", name) is None, (
+                "Primer {}: primer names must not contain spaces"
+            ).format(name)
+            for s in seqs:
+                s = s.strip()
+                assert re.search(r"\s", s) is None, (
+                    "Primer {}: primer sequences must not contain spaces"
+                ).format(name)
+                if not s:
+                    continue
+                if anchor:
                     s = add_anchor(s)
                 f.write(f">{name}\n{s}\n")
 
