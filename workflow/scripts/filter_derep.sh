@@ -15,7 +15,7 @@ out=$({
             --fastaout "${snakemake_output[filtered_tmp]}" \
             --fastaout_discarded "${snakemake_output[discarded_tmp]}" \
             --fastq_maxee_rate "${snakemake_params[maxee_rate]}" \
-            --fastq_qmax 42
+            --fastq_qmax 48
 } 2>&1)
 
 # output stats file based on parsing of intercepted output of VSEARCH command

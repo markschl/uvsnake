@@ -41,6 +41,7 @@ output=$(
         -fastqout_notmerged_fwd "$tempdir"/notmerged_R1.fastq \
         -fastqout_notmerged_rev "$tempdir"/notmerged_R2.fastq \
         -fastq_maxdiffs "${snakemake_params[max_diffs]}" \
+        -fastq_qmax 48 \
         -threads 1 \
         $extra \
         2>&1
