@@ -152,10 +152,6 @@ rule cluster_uparse:
 rule usearch_make_otutab:
     params:
         ident_threshold=config["otutab"]["ident_threshold"] / 100,
-        # optional diagnostic output
-        extra="true" if config["otutab"].get("extra", False) else "false",
-        bam_out="workdir/cluster/4_otutab/{primers}/{what}.bam",
-        map_out="workdir/cluster/4_otutab/{primers}/{what}_search.txt.gz",
         program=cfg_or_global_default("otutab", "program"),
         usearch_bin=usearch_bin(),
         maxaccepts=cfg_or_global_default("otutab", "maxaccepts"),
