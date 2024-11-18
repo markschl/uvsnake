@@ -7,6 +7,22 @@ _mem_f = 2
 _time_f = 4
 
 
+def mem_func(mem=5, f=0, max_mem=50000):
+    def _mem_func(wildcards, input, attempt):
+        _mem = mem + f * input.size_mb
+        return round(min(max_mem, _mem * 2 ** (attempt - 1)))
+
+    return _mem_func
+
+
+def time_func(time=1, f=0, max_time=24 * 60 * 20):
+    def _time_func(wildcards, input, attempt):
+        _time = time + f * input.size_mb
+        return round(min(max_time, _time * 2 ** (attempt - 1)))
+
+    return _time_func
+
+
 def unoise3_memfunc(program, min_size, threads):
     if program == "usearch":
         return lambda _, input, attempt: (

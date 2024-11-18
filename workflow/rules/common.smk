@@ -1,35 +1,19 @@
+# frequently used imports made available in all rules
+import sys
 import os
 from os.path import dirname, exists
 from glob import glob
 from collections import OrderedDict
 
 
-include: "utils.smk"
+__complements = bytes.maketrans(
+    b"ATCGRYKMBVDHNSWatcgrykmbvdhnsw -", b"TAGCYRMKVBHDNSWtagcyrmkvbhdnsw -"
+)
 
 
-#### Initialize ####
+def reverse_complement(seq):
+    return seq.translate(__complements)[::-1]
 
-
-# initialize samples if corresponding sections present in configuration
-# (otherwise we assume that uvsnake is used as Snakemake module and not all
-# functionality may be needed)
-if "primers" in config:
-    config["_primers"], config["_primer_combinations"] = get_primer_combinations(config)
-
-if "sample_file" in config and exists(config["sample_file"]):
-    # further add these settings to config (_underscore indicates that they are special)
-    l = SampleList(config["sample_file"])
-    config["_input"] = OrderedDict(l.samples())
-    config["_sample_names"] = list(config["_input"])
-    assert len(config["_sample_names"]) == len(
-        set(config["_sample_names"])
-    ), "Duplicate sample names found"
-    config["_layout"] = l.layout
-
-# from pprint import pprint; pprint(config)
-
-
-#### Helpers ####
 
 
 def cfg_path(*keys, default=None):
@@ -67,6 +51,11 @@ def usearch_bin():
     return config.get("usearch_binary", "usearch")
 
 
+def expand_clustered(path, **wildcards):
+    for f in glob("results/*/*.fasta"):
+        parts = f.split(os.sep)
+        yield from expand(path, primers=parts[1], seqs=parts[2].split(".")[0], **wildcards)
+
 
 def otutab_extra_files(bam, **wildcards):
     out = []
@@ -82,23 +71,90 @@ def otutab_extra_files(bam, **wildcards):
     return out
 
 
-def expand_clustered(path, **wildcards):
-    for f in glob("results/*/*.fasta"):
-        parts = f.split(os.sep)
-        yield from expand(path, primers=parts[1], seqs=parts[2].split(".")[0], **wildcards)
+import csv
+import re
+import sys
+from itertools import product
+import copy
 
 
-def mem_func(mem=5, f=0, max_mem=50000):
-    def _mem_func(wildcards, input, attempt):
-        _mem = mem + f * input.size_mb
-        return round(min(max_mem, _mem * 2 ** (attempt - 1)))
+class SampleList(object):
+    default_header = {"paired": ["id", "R1", "R2"], "single": ["id", "R1"]}
+    qiime_header = {
+        "paired": [
+            "sample-id",
+            "forward-absolute-filepath",
+            "reverse-absolute-filepath",
+        ],
+        "single": ["sample-id", "absolute-filepath"],
+    }
 
-    return _mem_func
+    def __init__(self, sample_file=None, layout=None, reserved_chars=None):
+        self._samples = []
+        if reserved_chars is None:
+            self.reserved_re = None
+        else:
+            self.reserved_re = re.compile(f"[{reserved_chars}]")
+        if sample_file is not None:
+            assert layout is None
+            self._read_samples(sample_file)
+        else:
+            assert layout in ("single", "paired")
+            self.layout = layout
+            self.ncol = 3 if layout == "paired" else 2
+            self.header = None
+        self.n_reads = self.ncol - 1
+
+    def _read_samples(self, sample_file):
+        with open(sample_file) as f:
+            rdr = csv.reader(f, delimiter="\t")
+            self.header = next(rdr)
+            self.ncol = len(self.header)
+            if self.ncol == 3:
+                self.layout = "paired"
+            elif self.ncol == 2:
+                self.layout = "single"
+            else:
+                raise AssertionError(
+                    "Invalid number of columns in sample file. "
+                    "Either two (single-end) or three (paired-end) are expected"
+                )
+            assert (
+                self.header == self.default_header[self.layout]
+                or self.header == self.qiime_header[self.layout]
+            ), (
+                "Unknown {}-end sample file header: '{}'. " "Valid are '{}' or '{}'"
+            ).format(
+                self.layout,
+                ",".join(self.header),
+                ",".join(self.default_header[self.layout]),
+                ",".join(self.qiime_header[self.layout]),
+            )
+            for row in rdr:
+                self.add(row[0], row[1:])
+
+    def add(self, sample, reads):
+        row = [sample] + list(reads)
+        assert len(row) == self.ncol
+        if self.reserved_re is not None:
+            (row[0], n) = self.reserved_re.subn("_", row[0])
+            if n > 0:
+                print(
+                    f"Reserved characters replaced in sample name: {row[0]}",
+                    file=sys.stderr,
+                )
+        self._samples.append(row)
+
+    def samples(self):
+        for row in self._samples:
+            yield row[0], row[1:]
 
 
-def time_func(time=1, f=0, max_time=24 * 60 * 20):
-    def _time_func(wildcards, input, attempt):
-        _time = time + f * input.size_mb
-        return round(min(max_time, _time * 2 ** (attempt - 1)))
+__complements = bytes.maketrans(
+    b"ATCGRYKMBVDHNSWatcgrykmbvdhnsw -", b"TAGCYRMKVBHDNSWtagcyrmkvbhdnsw -"
+)
 
-    return _time_func
+
+def reverse_complement(seq):
+    return seq.translate(__complements)[::-1]
+

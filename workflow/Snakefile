@@ -15,6 +15,7 @@ report: "report/workflow.rst"
 
 
 include: "rules/common.smk"
+include: "rules/init.smk"
 include: "rules/clean.smk"
 
 
@@ -22,10 +23,9 @@ include: "rules/clean.smk"
 # This allows using this workflow as module
 # (where schema validation can be skipped)
 if "_input" in config:
-
+    include: "rules/resources.smk"
     include: "rules/qc.smk"
     include: "rules/prepare_paired.smk"
-    include: "rules/cluster_resources.smk"
     include: "rules/cluster.smk"
     include: "rules/stats.smk"
     include: "rules/other.smk"
