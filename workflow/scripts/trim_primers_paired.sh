@@ -41,7 +41,7 @@ cutadapt "$fwd_out" \
     --overlap "${snakemake_params[min_overlap]}" \
     --no-indels \
     2>"${snakemake_output[rev_log]}" | # use 'seqtool' to split by primer combination (names in header)
-    st split --fq -o "$outdir/{a:fwd}...{a:rev}.fastq"
+    st split --fq -o "$outdir/{attr(fwd)}...{attr(rev)}.fastq"
 
 rm "$fwd_out"
 

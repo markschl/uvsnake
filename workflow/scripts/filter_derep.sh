@@ -9,7 +9,7 @@ set -xeuo pipefail
 sample="${snakemake_wildcards[sample]}"
 out=$({
     zstd -dcq "${snakemake_input[0]}" |  # decompress input file
-        st set -i "$sample.{num}" --fq | # Create ID from sample name + sequence number
+        st set -i "$sample.{seq_num}" --fq | # Create ID from sample name + sequence number
         st del -d --fq |                 # delete header descriptions
         vsearch -fastq_filter - \
             --fastaout "${snakemake_output[filtered_tmp]}" \

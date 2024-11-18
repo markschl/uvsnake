@@ -5,22 +5,22 @@ set -e
 # install seqtool
 outdir="$CONDA_PREFIX/bin"
 
-tag=v0.3.0
-prefix=https://github.com/markschl/seqtool/releases/download/$tag/seqtool-$tag
+tag=0.4.0-beta.2
+prefix=https://github.com/markschl/seqtool/releases/download/$tag/seqtool
 
 u="$(uname -s)"
 case "${u}" in
-    Linux*)     url=$prefix-$(arch)-unknown-linux-gnu.tar.gz;;
-    Darwin*)    url=$prefix-$(arch)-apple-darwin.tar.gz;;
+    Linux*)     url=$prefix-$(arch)-unknown-linux-gnu.tar.xz;;
+    Darwin*)    url=$prefix-$(arch)-apple-darwin.tar.xz;;
     *)          echo "Linux or Mac expected" >&2 && exit 1
 esac
 
 tmp=_seqtool_tmp
-f=$tmp/seqtool.tar.gz
+f=$tmp/seqtool.tar.xz
 mkdir -p $tmp
 
 wget -O $f "$url"
-tar -xzf $f -C $tmp
-mv $tmp/st "$outdir"
+tar -xJf $f -C $tmp
+mv $tmp/*/st "$outdir"
 
 rm -R $tmp

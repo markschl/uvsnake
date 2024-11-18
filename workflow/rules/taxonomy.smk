@@ -62,7 +62,7 @@ rule make_tax_fasta:
     shell:
         """
         tax="{input.tax}"
-        st set -ul <(gzip -dc "$tax") -d {{l:2}} "{input.fa}" |
+        st set -m <(gzip -dc "$tax") -d "{{meta(2)}}" "{input.fa}" |
           st replace -d '__' ':' |
           st replace -dr ' *; *' ' ' |
           gzip -nc > {output}
