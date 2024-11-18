@@ -7,13 +7,13 @@ from collections import OrderedDict
 
 
 __complements = bytes.maketrans(
-    b"ATCGRYKMBVDHNSWatcgrykmbvdhnsw -", b"TAGCYRMKVBHDNSWtagcyrmkvbhdnsw -"
+    b"ATCGRYKMBVDHNSWatcgrykmbvdhnsw -",
+    b"TAGCYRMKVBHDNSWtagcyrmkvbhdnsw -"
 )
 
 
 def reverse_complement(seq):
     return seq.translate(__complements)[::-1]
-
 
 
 def cfg_path(*keys, default=None):
@@ -71,13 +71,6 @@ def otutab_extra_files(bam, **wildcards):
     return out
 
 
-import csv
-import re
-import sys
-from itertools import product
-import copy
-
-
 class SampleList(object):
     default_header = {"paired": ["id", "R1", "R2"], "single": ["id", "R1"]}
     qiime_header = {
@@ -94,6 +87,7 @@ class SampleList(object):
         if reserved_chars is None:
             self.reserved_re = None
         else:
+            import re
             self.reserved_re = re.compile(f"[{reserved_chars}]")
         if sample_file is not None:
             assert layout is None
@@ -106,6 +100,7 @@ class SampleList(object):
         self.n_reads = self.ncol - 1
 
     def _read_samples(self, sample_file):
+        import csv
         with open(sample_file) as f:
             rdr = csv.reader(f, delimiter="\t")
             self.header = next(rdr)
@@ -148,13 +143,4 @@ class SampleList(object):
     def samples(self):
         for row in self._samples:
             yield row[0], row[1:]
-
-
-__complements = bytes.maketrans(
-    b"ATCGRYKMBVDHNSWatcgrykmbvdhnsw -", b"TAGCYRMKVBHDNSWtagcyrmkvbhdnsw -"
-)
-
-
-def reverse_complement(seq):
-    return seq.translate(__complements)[::-1]
 
