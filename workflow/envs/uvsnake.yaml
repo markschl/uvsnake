@@ -1,8 +1,8 @@
 dependencies:
   - python >=3.6
-  - vsearch=2.27
+  - vsearch=2.29
   - zstd=1.5
-  - cutadapt=4.6
-  - biom-format=2.1.15
+  - cutadapt=4.9
+  - biom-format=2.1
   - pyyaml=6.0
-  - biopython=1.83
+  - biopython=1.84
