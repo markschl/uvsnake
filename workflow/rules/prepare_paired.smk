@@ -13,10 +13,10 @@ rule merge_paired:
         r2=lambda wildcards: config["_input"][wildcards.sample][1],
     output:
         tempdir=temp(directory("workdir/prepare_paired/1_merge/{sample}/tmp")),
-        merged="workdir/prepare_paired/1_merge/{sample}/{sample}.fastq.zst",
-        nm_r1="workdir/prepare_paired/1_merge/{sample}/{sample}_notmerged_R1.fastq.zst",
-        nm_r2="workdir/prepare_paired/1_merge/{sample}/{sample}_notmerged_R2.fastq.zst",
-        stats="workdir/prepare_paired/1_merge/{sample}/{sample}_stats.txt",
+        merged=temp("workdir/prepare_paired/1_merge/{sample}/{sample}.fastq.zst"),
+        nm_r1=temp("workdir/prepare_paired/1_merge/{sample}/{sample}_notmerged_R1.fastq.zst"),
+        nm_r2=temp("workdir/prepare_paired/1_merge/{sample}/{sample}_notmerged_R2.fastq.zst"),
+        stats=temp("workdir/prepare_paired/1_merge/{sample}/{sample}_stats.txt"),
     log:
         "logs/prepare_paired/1_merge/{sample}.log",
     conda:
@@ -44,11 +44,11 @@ rule trim_primers_paired:
     output:
         fwd_log="workdir/prepare_paired/2_trim/{sample}/{sample}_fwd.log",
         rev_log="workdir/prepare_paired/2_trim/{sample}/{sample}_rev.log",
-        stats="workdir/prepare_paired/2_trim/{sample}/{sample}_stats.txt",
-        by_primers=expand(
+        stats=temp("workdir/prepare_paired/2_trim/{sample}/{sample}_stats.txt"),
+        by_primers=temp(expand(
             "workdir/prepare_paired/2_trim/{{sample}}/{primers}.fastq.zst",
             primers=config["_primer_combinations"],
-        ),
+        )),
         short="workdir/prepare_paired/2_trim/{sample}/too_short.fastq.zst",
     log:
         "logs/prepare_paired/2_trim/{sample}.log",
