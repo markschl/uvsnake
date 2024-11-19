@@ -5,7 +5,7 @@ set -xeuo pipefail
 
 # we know that the output files are all in the same directory, therefore
 # we can use the dirname of the first file
-split_files=("${snakemake_output[by_primers]}")
+split_files=(${snakemake_output[by_primers]})
 outdir="$(dirname "${split_files[0]}")"
 mkdir -p "$outdir"
 
