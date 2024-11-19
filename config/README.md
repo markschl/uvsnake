@@ -277,7 +277,7 @@ otutab:
 # Taxonomy assignment options
 sintax:
   # path to database (can be GZIP-compressed)
-  db: unite.fasta.gz
+  db: db.fasta.gz
   # database format: (example has only kingdom and order defined)
   # * QIIME-style: >id k__Kingdom;p__;o__Order;f__;g__;s__;
   # * UTAX-style headers: >id;tax=k:Kingdom,o:Order;
@@ -285,8 +285,19 @@ sintax:
   # bootstrap threshold
   confidence: 0.9
   # (optional) other settings, overriding above defaults
-  # program: usearch
-  # # (only used by USEARCH:)
-  # maxaccepts: 8
-  # maxrejects: 8
+  # program: vsearch
+
+  # confidence setting override for first primer combination
+  # (database 'db.fasta.gz' is still used)
+  - fwd_primer1...rev_primer1:
+    confidence: 0.8
+    # random seed to ensure reproducibility (but only single thread is used, which is slower)
+    rand_seed: 42
+
+  # use another database file for second primer combination
+  # (overriding the global setting, which is only used if there is
+  # no specific setting for a primer combination)
+  - fwd_primer2...rev_primer2:
+    db: db2_utax.fasta.gz
+    db_format: utax
 ```

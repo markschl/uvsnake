@@ -59,12 +59,65 @@ def get_primer_combinations(primer_cfg):
     return primers, combinations
 
 
+def init_sintax_config(config):
+    import hashlib
+    required_keys = ["db", "db_format", "confidence"]
+    optional_keys = ["program", "maxaccepts", "maxrejects"]
+    cfg = config["sintax"]
+    db2hash = config['_taxdb_id_from_path'] = {}
+    hash2db = config['_taxdb_from_id'] = {}
+    # fill in missing configurations and make path hashes
+    for comb in config["_primer_combinations"]:
+        try:
+            _cfg = cfg[comb]
+        except KeyError:
+            _cfg = {}
+        # fill in missing keys from global sintax config
+        for k in required_keys + optional_keys:
+            if not k in _cfg:
+                try:
+                    _cfg[k] = cfg[k]
+                except KeyError:
+                    pass
+        # validate required keys
+        for key in required_keys:
+            assert key in _cfg, (
+                "Missing key '{key}' in the 'sintax' configuration section for "
+                "the primer combination '{comb}'. The key needs to be present either "
+                "globally in the 'sintax' section or in the sintax/{comb} section:"
+                "\n\nsintax:\n  {key}: <value>\n\nOR:\n\nsintax:\n  {comb}:\n    {key}: <value>\n"
+            ).format(key=key, comb=comb)
+        # get optional settings from defaults section
+        for key in optional_keys:
+            if not key in _cfg:
+                try:
+                    _cfg[key] = config["defaults"][key]
+                except KeyError:
+                    pass
+        # make path hash
+        path = _cfg["db"]
+        fmt = _cfg["db_format"]
+        abs_path = os.path.abspath(path)
+        hash_value = hashlib.sha256(abs_path.encode()).hexdigest()
+        while hash_value in hash2db and hash2db[hash_value][0] != abs_path:
+            # hash collision found: make the hash unique again.
+            # Collision are detected across different files
+            # within the same run, but not across repeated runs with
+            # changing configurations
+            hash_value += "$"
+        db2hash[path] = hash_value
+        hash2db[hash_value] = (abs_path, fmt)
+
+
+
 # Initialize primers, taxonomy and input samples if corresponding sections 
 # present in configuration
 # (otherwise we assume that uvsnake is used as Snakemake module and not all
 # functionality may be needed)
 if "primers" in config:
     config["_primers"], config["_primer_combinations"] = get_primer_combinations(config["primers"])
+    if "sintax" in config:
+        init_sintax_config(config)
 
 if "sample_file" in config and exists(config["sample_file"]):
     # further add these settings to config (_underscore indicates that they are special)

@@ -1,13 +1,13 @@
 
 rule import_taxdb:
     params:
-        format=lambda _: config["sintax"]["db_format"],
+        format=lambda wildcards: config["_taxdb_from_id"][wildcards.id][1],
     input:
-        db=lambda _: config["sintax"]["db"],
+        db=lambda wildcards: config["_taxdb_from_id"][wildcards.id][0],
     output:
-        db="workdir/sintax/taxdb.fasta",
+        db="workdir/sintax/taxdb_{id}.fasta",
     log:
-        "logs/sintax/import_taxdb.log",
+        "logs/sintax/import_taxdb_{id}.log",
     conda:
         "../envs/uvsnake.yaml"
     group:
@@ -18,15 +18,18 @@ rule import_taxdb:
 
 rule assign_taxonomy_sintax:
     params:
-        confidence=lambda _: config["sintax"]["confidence"],
-        program=lambda _: with_default("program", "sintax"),
-        usearch_bin=lambda _: config["usearch_binary"],
+        confidence=lambda wildcards: config["sintax"][wildcards.primers]["confidence"],
+        program=lambda wildcards: config["sintax"][wildcards.primers]["program"],
+        usearch_bin=lambda _: usearch_bin(),
         # TODO: not sure if USEARCH even uses these settings (VSEARCH doesnt')
-        maxaccepts=lambda _: with_default("maxaccepts", "sintax"),
-        maxrejects=lambda _: with_default("maxrejects", "sintax"),
+        maxaccepts=lambda wildcards: config["sintax"][wildcards.primers]["maxaccepts"],
+        maxrejects=lambda wildcards: config["sintax"][wildcards.primers]["maxrejects"],
     input:
         fa="results/{primers}/{what}.fasta",
-        db="workdir/sintax/taxdb.fasta",
+        db=lambda wildcards: expand(
+            "workdir/sintax/taxdb_{id}.fasta",
+            id=config["_taxdb_id_from_path"][config["sintax"][wildcards.primers]["db"]]
+        ),
     output:
         sintax="results/{primers}/{what}_sintax.txt.gz",
         taxtab="results/{primers}/{what}_sintax_taxtab.txt.gz",
