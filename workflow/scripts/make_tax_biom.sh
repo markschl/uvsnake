@@ -7,8 +7,8 @@ mkdir -p "$(dirname "${snakemake_output[tax_tmp]}")"
 
 # write header
 gzip -dc "${snakemake_input[tax]}" |
-    sed 's/Taxon/taxonomy/g' |
-    sed 's/Feature ID/# Feature ID/g' >"${snakemake_output[tax_tmp]}"
+    sed 's/ *Taxon */taxonomy/g' |
+    sed 's/ *Feature ID */# Feature ID/g' >"${snakemake_output[tax_tmp]}"
 
 # write rest
 if [[ $(wc -l <"${snakemake_output[tax_tmp]}") -ge 2 ]]; then

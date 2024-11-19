@@ -18,12 +18,10 @@ rule import_taxdb:
 
 rule assign_taxonomy_sintax:
     params:
+        program=lambda _: config["sintax"]["program"],
         confidence=lambda wildcards: config["sintax"][wildcards.primers]["confidence"],
-        program=lambda wildcards: config["sintax"][wildcards.primers]["program"],
-        usearch_bin=lambda _: usearch_bin(),
-        # TODO: not sure if USEARCH even uses these settings (VSEARCH doesnt')
-        maxaccepts=lambda wildcards: config["sintax"][wildcards.primers]["maxaccepts"],
-        maxrejects=lambda wildcards: config["sintax"][wildcards.primers]["maxrejects"],
+        strand=lambda wildcards: config["sintax"][wildcards.primers]["strand"],
+        rand_seed=lambda wildcards: config["sintax"][wildcards.primers]["rand_seed"],
     input:
         fa="results/{primers}/{what}.fasta",
         db=lambda wildcards: expand(
@@ -39,8 +37,7 @@ rule assign_taxonomy_sintax:
         "taxonomy"
     conda:
         "../envs/uvsnake.yaml"
-    # VSEARCH works in parallel, while USEARCH v11/v12 does not appear to use more than 1 thread
-    threads: lambda _: workflow.cores if cfg_or_global_default("sintax", "program") == "vsearch" else 1
+    threads: workflow.cores,
     resources:
         mem_mb=5000,
         runtime=240,

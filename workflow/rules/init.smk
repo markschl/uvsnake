@@ -62,7 +62,7 @@ def get_primer_combinations(primer_cfg):
 def init_sintax_config(config):
     import hashlib
     required_keys = ["db", "db_format", "confidence"]
-    optional_keys = ["program", "maxaccepts", "maxrejects"]
+    optional_keys = ["program", "strand", "rand_seed"]
     cfg = config["sintax"]
     db2hash = config['_taxdb_id_from_path'] = {}
     hash2db = config['_taxdb_from_id'] = {}
@@ -87,13 +87,6 @@ def init_sintax_config(config):
                 "globally in the 'sintax' section or in the sintax/{comb} section:"
                 "\n\nsintax:\n  {key}: <value>\n\nOR:\n\nsintax:\n  {comb}:\n    {key}: <value>\n"
             ).format(key=key, comb=comb)
-        # get optional settings from defaults section
-        for key in optional_keys:
-            if not key in _cfg:
-                try:
-                    _cfg[key] = config["defaults"][key]
-                except KeyError:
-                    pass
         # make path hash
         path = _cfg["db"]
         fmt = _cfg["db_format"]
@@ -130,4 +123,18 @@ if "sample_file" in config and exists(config["sample_file"]):
     config["_layout"] = l.layout
 
 # from pprint import pprint; pprint(config)
+# fill in the correct USEARCH/VSEARCH binary for each section
+for section in ["merge", "unoise3", "uparse", "otutab", "sintax"]:
+    if section in config:
+        print(section, config[section])
+        program = config[section].get("program", None)
+        if program is None:
+            program = config["program"]
+        program = program.strip().lower()
+        if program == "usearch":
+            program = config.get("usearch_binary", "usearch")
+        else:
+            assert program == "vsearch", "Unknown program '{}', valid are 'usearch' or 'vsearch'".format(program)
+        config[section]["program"] = program
+
 

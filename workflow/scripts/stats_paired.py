@@ -80,11 +80,17 @@ def percent(x, y):
     return round(100 * x / y, 2) if y > 0 else 0.0
 
 
+# same code in every Python script due to https://github.com/snakemake/snakemake/issues/1632
 @contextmanager
 def file_logging(f):
-    with open(f, "w") as handle:
-        sys.stderr = sys.stdout = handle
-        yield
+    with open(f, "w") as log:
+        sys.stderr = log
+        try:
+            yield
+        except Exception:
+            import traceback
+            log.write(traceback.format_exc())
+            sys.exit(1)
 
 
 with file_logging(snakemake.log[0]):

@@ -5,12 +5,9 @@ localrules:
 
 rule merge_paired:
     params:
+        program=lambda _: config["merge"]["program"],
         overlap_ident=config["merge"]["overlap_ident"],
         max_diffs=config["merge"]["max_diffs"],
-        program=cfg_or_global_default("merge", "program"),
-        usearch_bin=usearch_bin(),
-        maxaccepts=cfg_or_global_default("merge", "maxaccepts"),
-        maxrejects=cfg_or_global_default("merge", "maxrejects"),
     input:
         r1=lambda wildcards: config["_input"][wildcards.sample][0],
         r2=lambda wildcards: config["_input"][wildcards.sample][1],
@@ -27,8 +24,8 @@ rule merge_paired:
     group:
         "sample"
     resources:
-        # cannot use lambda functions (https://github.com/snakemake/snakemake/issues/2154#issuecomment-1553538507)
-        # mem_mb=mem_func(120 if cfg_or_global_default("merge", "program") == "usearch" else 40),  # VSEARCH: ~16MB, USEARCH: <=78MB
+        # TODO: cannot use lambda functions (https://github.com/snakemake/snakemake/issues/2154#issuecomment-1553538507)
+        # mem_mb=mem_func(40 if config["merge"]["program"] == "vsearch" else 120),  # VSEARCH: ~16MB, USEARCH: <=78MB
         runtime=60,  # time_func(5, f=0.2),  # 0.003-0.006 min/MB of gzip input
     script:
         "../scripts/merge_paired.sh"

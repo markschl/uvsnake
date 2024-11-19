@@ -80,11 +80,10 @@ rule collect_derep:
 
 rule cluster_unoise3:
     params:
+        program=lambda _: config["unoise3"]["program"],
         min_size=lambda _: config["unoise3"]["min_size"],
-        program=lambda _: cfg_or_global_default("unoise3", "program"),
-        usearch_bin=usearch_bin(),
-        maxaccepts=lambda _: cfg_or_global_default("unoise3", "maxaccepts"),
-        maxrejects=lambda _: cfg_or_global_default("unoise3", "maxrejects"),
+        maxaccepts=lambda _: config["unoise3"]["maxaccepts"],
+        maxrejects=lambda _: config["unoise3"]["maxrejects"],
     input:
         "workdir/cluster/2_unique_all/{primers}/good_uniques.fasta.zst",
     output:
@@ -93,20 +92,18 @@ rule cluster_unoise3:
         "logs/cluster/3_cluster/{primers}_unoise3.log",
     conda:
         "../envs/uvsnake.yaml"
-    # threads:
-    # VSEARCH works in parallel (although cores seem to be used only ~50%) while
-    # USEARCH v11 does not appear to use more than 1 thread
-    threads: workflow.cores if with_default("program", "unoise3") == "vsearch" else 1
+    threads:
+        cluster_cores(config["unoise3"]["program"], len(config["_primer_combinations"]), workflow.cores)
     resources:
         mem_mb=unoise3_memfunc(
-            cfg_or_global_default("unoise3", "program"),
-            cfg_path("unoise3", "min_size", default=8),
+            config["unoise3"]["program"],
+            config["unoise3"]["min_size"],
             workflow.cores,
         ),
         runtime=unoise3_timefunc(
-            cfg_or_global_default("unoise3", "program"),
-            cfg_path("unoise3", "min_size", default=8),
-            cfg_or_global_default("unoise3", "maxrejects"),
+            config["unoise3"]["program"],
+            config["unoise3"]["min_size"],
+            config["unoise3"]["maxrejects"],
             workflow.cores,
         ),
     script:
@@ -115,10 +112,10 @@ rule cluster_unoise3:
 
 rule cluster_uparse:
     params:
-        usearch_bin=usearch_bin(),
+        program=lambda _: config["uparse"]["program"],
         min_size=lambda _: config["uparse"]["min_size"],
-        maxaccepts=lambda _: cfg_or_global_default("uparse", "maxaccepts"),
-        maxrejects=lambda _: cfg_or_global_default("uparse", "maxrejects"),
+        maxaccepts=lambda _: config["uparse"]["maxaccepts"],
+        maxrejects=lambda _: config["uparse"]["maxrejects"],
     input:
         "workdir/cluster/2_unique_all/{primers}/good_uniques.fasta.zst",
     output:
@@ -129,17 +126,17 @@ rule cluster_uparse:
     conda:
         "../envs/uvsnake.yaml"
     resources:
-        mem_mb=uparse_memfunc(cfg_path("uparse", "min_size", default=2)),
+        mem_mb=uparse_memfunc(config["uparse"]["min_size"]),
         runtime=uparse_timefunc(
-            cfg_path("uparse", "min_size", default=2),
-            cfg_or_global_default("uparse", "maxaccepts"),
+            config["uparse"]["min_size"],
+            config["uparse"]["maxaccepts"],
         ),
     shell:
         """
         exec &> {log[0]}
         set -xeuo pipefail
         zstd -dcq {input} > {output.tmp_in}
-        "{params.usearch_bin}" \
+        "{params.program}" \
             -cluster_otus {output.tmp_in} \
             -otus {output.fa} \
             -relabel Otu \
@@ -151,11 +148,10 @@ rule cluster_uparse:
 
 rule make_otutab:
     params:
-        ident_threshold=config["otutab"]["ident_threshold"] / 100,
-        program=cfg_or_global_default("otutab", "program"),
-        usearch_bin=usearch_bin(),
-        maxaccepts=cfg_or_global_default("otutab", "maxaccepts"),
-        maxrejects=cfg_or_global_default("otutab", "maxrejects"),
+        program=lambda _: config["otutab"]["program"],
+        ident_threshold=lambda _: config["otutab"]["ident_threshold"] / 100,
+        maxaccepts=lambda _: config["otutab"]["maxaccepts"],
+        maxrejects=lambda _: config["otutab"]["maxrejects"],
     input:
         otus="results/{primers}/{what}.fasta",
         uniques="workdir/cluster/2_unique_all/{primers}/all_uniques.fasta.zst",
@@ -164,17 +160,17 @@ rule make_otutab:
         biom="results/{primers}/{what}.biom",
         notmatched="workdir/cluster/4_otutab/{primers}/{what}_otutab_notmatched.fasta.zst",
         extra=otutab_extra_files(bam=False),
-    threads: workflow.cores
+    threads: otutab_cores(config["otutab"]["program"], len(config["_primer_combinations"]), workflow.cores)
     log:
         "logs/cluster/4_otutab/{primers}_{what}.log",
     conda:
         "../envs/uvsnake.yaml"
     resources:
-        mem_mb=otutab_memfunc(cfg_or_global_default("otutab", "program"), workflow.cores),
+        mem_mb=otutab_memfunc(config["otutab"]["program"], workflow.cores),
         runtime=otutab_timefunc(
-            cfg_or_global_default("otutab", "program"),
-            cfg_or_global_default("otutab", "maxaccepts", fallback=1),
-            cfg_or_global_default("otutab", "maxrejects", fallback=1),
+            config["otutab"]["program"],
+            config["otutab"]["maxaccepts"],
+            config["otutab"]["maxrejects"],
             workflow.cores,
         ),
     script:
@@ -209,11 +205,10 @@ rule otutab_sam2bam:
 
 # rule post_cluster:
 #     params:
-#         threshold=config["post_cluster"]["ident_threshold"]/100,
-#         program=cfg_or_global_default("post_cluster", "program"),
-#         usearch_bin=usearch_bin(),
-#         maxaccepts=cfg_or_global_default("post_cluster", "maxaccepts"),
-#         maxrejects=cfg_or_global_default("post_cluster", "maxrejects"),
+#       threshold=lambda _: config["post_cluster"]["ident_threshold"]/100,
+#       program=lambda _: config["post_cluster"]["program"],
+#       maxaccepts=lambda _: config["post_cluster"]["maxaccepts"],
+#       maxrejects=lambda _: config["post_cluster"]["maxrejects"],
 #     input:
 #         seqs="results/{primers}/unoise3.fasta",
 #         biom="results/{primers}/unoise3.biom",
@@ -227,6 +222,6 @@ rule otutab_sam2bam:
 #     group:
 #         "cluster"
 #     threads:
-#         int(workflow.cores * 1.5) if cfg_or_global_default("post_cluster", "program") == "vsearch" else 1
+#         int(workflow.cores * 1.5) if config["post_cluster"]["program"] == "vsearch" else 1
 #     script:
 #         "../scripts/post_cluster.py"

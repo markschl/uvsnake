@@ -3,26 +3,18 @@ $id: https://raw.githubusercontent.com/markschl/uvsnake/main/workflow/config.sch
 description: USEARCH/VSEARCH-based amplicon pipeline configuration
 properties:
 
-  defaults:
-    type: object
-    properties:
-      program:
-        type: string
-        enum: [vsearch, usearch]
-      maxaccepts:
-        type: integer
-        minimum: 1
-        default: 1
-      maxrejects:
-        type: integer
-        minimum: 1
-        default: 1
+  program:
+    type: string
+    enum: [vsearch, usearch]
+    description:
+      The program (USEARCH or VSEARCH) to use by default for all commands.
+      This can be overridden by the 'program' setting of commands.
 
   usearch_binary:
     type: string
     description:
         Path to a custom USEARCH binary that should be used instead
-        of the open-sourced v12 beta (download from https://drive5.com/usearch,
+        of v12 beta (download from https://drive5.com/usearch,
         respectively https://github.com/rcedgar/usearch_old_binaries).
 
   sample_file:
@@ -92,7 +84,7 @@ properties:
       max_diffs:
         type: integer
         minimum: 0
-      program: { $ref: "#/properties/defaults/properties/program" }
+      program: { $ref: "#/properties/program" }
     required: [overlap_ident, max_diffs]
     additionalProperties: false
   
@@ -112,9 +104,19 @@ properties:
       min_size:
         type: integer
         minimum: 1
-      program: { $ref: "#/properties/defaults/properties/program" }
-      maxaccepts: { $ref: "#/properties/defaults/properties/maxaccepts" }
-      maxrejects: { $ref: "#/properties/defaults/properties/maxrejects" }
+      program: { $ref: "#/properties/program" }
+      maxaccepts:
+        type: integer
+        minimum: 1
+        default: 1
+        description:
+          This termination option seems unused or without effect in VSEARCH.
+          Changing it also has little impact on performance and results of USEARCH.
+      maxrejects:
+        type: integer
+        minimum: 1
+        default: 32  # default in VSEARCH, not used by USEARCH
+        description: This termination option not used by USEARCH (but by VSEARCH).
     required: [min_size]
     additionalProperties: false
   
@@ -125,9 +127,16 @@ properties:
         type: integer
         minimum: 1
         default: 2
-      program: { $ref: "#/properties/defaults/properties/program" }
-      maxaccepts: { $ref: "#/properties/defaults/properties/maxaccepts" }
-      maxrejects: { $ref: "#/properties/defaults/properties/maxrejects" }
+      program: { $ref: "#/properties/program" }
+      maxaccepts:
+        type: integer
+        minimum: 1
+        default: 1  # default in USEARCH v12
+      maxrejects:
+        type: integer
+        minimum: 1
+        default: 32  # default in USEARCH v12
+        description: This termination option has a neglectable impact on speed
     required: [min_size]
     additionalProperties: false
   
@@ -154,9 +163,21 @@ properties:
           and
           (2) in case of using VSEARCH a BAM file that allows inspecting the
           mapped reads.
-      program: { $ref: "#/properties/defaults/properties/program" }
-      maxaccepts: { $ref: "#/properties/defaults/properties/maxaccepts" }
-      maxrejects: { $ref: "#/properties/defaults/properties/maxrejects" }
+      program: { $ref: "#/properties/program" }
+      # references: https://rcedgar.github.io/usearch12_documentation/termination_options.html
+      # and https://github.com/rcedgar/usearch12/blob/master/src/terminator.cpp
+      maxaccepts:
+        type: integer
+        minimum: 1
+        default: 8
+        description:
+          The default of this termination option is 8 in USEARCH v11 and 4 in v10.
+      maxrejects:
+        type: integer
+        minimum: 1
+        default: 256
+        description:
+          The default of this termination option is 256 in USEARCH v11 and 64 in v10.
     required: [ident_threshold]
     additionalProperties: false
 
@@ -167,7 +188,7 @@ properties:
   #       type: number
   #       minimum: 2
   #       maximum: 100
-  #     program: { $ref: "#/properties/defaults/properties/program" }
+  #     program: { $ref: "#/properties/program" }
   #     maxaccepts:
   #       type: integer
   #       minimum: 1
@@ -190,12 +211,47 @@ properties:
         type: number
         minimum: 0
         maximum: 1
-      program: { $ref: "#/properties/defaults/properties/program" }
-      maxaccepts: { $ref: "#/properties/defaults/properties/maxaccepts" }
-      maxrejects: { $ref: "#/properties/defaults/properties/maxrejects" }
-    required: [db, db_format, confidence]
+      program: { $ref: "#/properties/program" }
+      strand:
+        type: string
+        enum: [both, plus]
+        default: both
+        description:
+          Search on both strands ('both') or only the forward strand ('plus'),
+          which is faster. If you are sure that all database sequences
+          have the same orientation, 'plus' can be specified, otherwise
+          the default of 'both' will be used.
+      rand_seed:
+        type: integer
+        minimum: 0
+        default: 0
+        description:
+          Random seed to ensure reproducibility (VSEARCH only). The seed must
+          be > 0, and it should be noted that multi-threaded taxonomic assignment
+          is not possible with this option, only a single thread is used.
+    patternProperties:
+      ^[^\s]+\.\.\.[^\s]+$:
+        type: object
+        properties:
+          db:
+            type: string
+          db_format:
+            type: string
+          confidence:
+            type: number
+            minimum: 0
+            maximum: 1
+          program: { $ref: "#/properties/program" }
+          strand:
+            type: string
+            enum: [both, plus]
+            default: both
+          rand_seed:
+            type: integer
+            minimum: 0
+            default: 0
     additionalProperties: false
 
 additionalProperties: false
 
-required: [defaults, primers, merge, filter, otutab]
+required: [program, primers, merge, filter, otutab]

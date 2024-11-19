@@ -16,41 +16,6 @@ def reverse_complement(seq):
     return seq.translate(__complements)[::-1]
 
 
-def cfg_path(*keys, default=None):
-    """
-    Get a nested dict entry or default if non-existent
-    """
-    return _cfg_path(config, *keys)
-
-
-def _cfg_path(cfg, *keys, default=None):
-    if len(keys) == 0:
-        return cfg
-    try:
-        sub = cfg[keys[0]]
-        return _cfg_path(sub, *keys[1:])
-    except KeyError:
-        return default
-
-
-def cfg_or_global_default(*keys, fallback=None):
-    """
-    Helper function that obtains a value for program/maxaccepts/maxrejects,
-    or the default value from the 'defaults' section.
-    This is necessary because validate() does not fill all defaults from the
-    JSON schema
-    """
-    value = cfg_path(*keys, default=fallback)
-    if value is fallback:
-        value = config["defaults"].get(keys[-1], fallback)
-        assert not value is fallback, "No fallback setting for '{}' in 'defaults' section".format(keys[-1])
-    return value
-
-
-def usearch_bin():
-    return config.get("usearch_binary", "usearch")
-
-
 def expand_clustered(path, **wildcards):
     for f in glob("results/*/*.fasta"):
         parts = f.split(os.sep)
@@ -62,7 +27,7 @@ def otutab_extra_files(bam, **wildcards):
     if config["otutab"].get("extra", False):
         prefix = expand("workdir/cluster/4_otutab/{primers}/{what}", allow_missing=True, **wildcards)[0]
         out.append(prefix + "_search.txt.gz")
-        if cfg_or_global_default("otutab", "program") == "vsearch":
+        if config["otutab"]["program"] == "vsearch":
             if bam:
                 out.append(prefix + ".bam")
                 out.append(prefix + ".bam.bai")

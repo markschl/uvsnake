@@ -20,7 +20,6 @@ done
 if [[ "${snakemake_params[program]}" == "vsearch" ]]; then
     # Parameter differences to USEARCH: --strand plus --sizein
     # -otutab already assumes -strand plus and will fail without size annotations
-    # https://www.drive5.com/usearch/manual/cmd_otutab.html
     # VSEARCH -usearch_global needs to be told these things
     zstd -dcq "${snakemake_input[uniques]}" |
         vsearch \
@@ -37,10 +36,13 @@ if [[ "${snakemake_params[program]}" == "vsearch" ]]; then
             --threads ${snakemake[threads]} \
             $extra
 
-elif [[ "${snakemake_params[program]}" == "usearch" ]]; then
+else
+    # usearch -usearch_global doesn't work with size annotations in v11 (although it does in v12),
+    # but there is a dedicated -otutab command
+    # https://www.drive5.com/usearch/manual/cmd_otutab.html
     uniques=$(mktemp "${snakemake_input[uniques]%.*.*}".XXXXXX.fasta)
     zstd -dqf "${snakemake_input[uniques]}" -o "$uniques"
-    "${snakemake_params[usearch_bin]}" \
+    "${snakemake_params[program]}" \
         -otutab "$uniques" \
         -otus "${snakemake_input[otus]}" \
         -id "${snakemake_params[ident_threshold]}" \
@@ -65,9 +67,6 @@ elif [[ "${snakemake_params[program]}" == "usearch" ]]; then
     # end="$(tail -n3 "${snakemake_output[biom]}")"
     # truncate -s -$(wc -c <<< "$end") "${snakemake_output[biom]}"
     # echo $end | sed -E 's/\], *\] *\} *$/]]}/g' >> "${snakemake_output[biom]}"
-else
-    echo "unknown program: ${snakemake_params[program]}"
-    exit 1
 fi
 
 # compress the output

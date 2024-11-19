@@ -64,6 +64,7 @@ def convert_taxdb_utax(input, output):
 
 
 def import_taxdb(input, output, format):
+    
     if format == "qiime":
         convert_taxdb_utax(input, output)
     else:
@@ -76,12 +77,17 @@ def import_taxdb(input, output, format):
             os.symlink(input, output)
 
 
+# same code in every Python script due to https://github.com/snakemake/snakemake/issues/1632
 @contextmanager
 def file_logging(f):
-    with open(f, "w") as handle:
-        sys.stderr = sys.stdout = handle
-        yield
-
+    with open(f, "w") as log:
+        sys.stderr = log
+        try:
+            yield
+        except Exception:
+            import traceback
+            log.write(traceback.format_exc())
+            sys.exit(1)
 
 with file_logging(snakemake.log[0]):
     import_taxdb(

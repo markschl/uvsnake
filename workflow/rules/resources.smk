@@ -1,5 +1,5 @@
 # Memory and time constraints for HPC:
-# Approximation based on benchmarks and non-linear regression
+# Approximations based on benchmarks and non-linear regression
 # (could always be inproved)
 # Some safety margin is added by multiplying the memory and time constraints with a factor
 # In addition, constraints are doubled at every attempt of re-running after a fail
@@ -66,6 +66,32 @@ def uparse_timefunc(min_size, maxaccepts):
 from os.path import getsize
 from math import log
 
+
+def cluster_cores(program, n_amplicons, max_cores):
+    if program == "usearch":
+        # USEARCH v11/v12 do not appear to use more than 1 thread
+        return 1
+    else:
+        # VSEARCH uses all cores.
+        # But in case of multiple amplicons, leave some cores free for the
+        # merging/trimming processes that may still be ongoing
+        # TODO: may still be inefficient
+        other_amplicons = n_amplicons - 1
+        return max(1, max_cores//2, max_cores * (1 - other_amplicons*0.2))
+
+
+def otutab_cores(program, n_amplicons, max_cores):
+    if program == "usearch":
+        # Only one core used for clustering:
+        # don't use all available cores, but leave some for the clustering
+        # processes of other primer combinations, which may take longer.
+        # If all cores were used, the OTU table creation would have to wait
+        # until ready other clustering/preparation processes are finished.
+        return max(1, max_cores // 2, max_cores - n_amplicons)
+    else:
+        # VSEARCH uses multiple cores for clustering, and for OTU table
+        # creation we just use everything available
+        return max_cores
 
 def otutab_memfunc(program, threads):
     if program == "usearch":

@@ -29,11 +29,17 @@ def make_primer_fasta(primers, fwd_out, rev_out, rev_rev_out):
     _make_fasta(primers["reverse_rev"], rev_rev_out, lambda s: s + '$')
 
 
+# same code in every Python script due to https://github.com/snakemake/snakemake/issues/1632
 @contextmanager
 def file_logging(f):
-    with open(f, "w") as handle:
-        sys.stderr = sys.stdout = handle
-        yield
+    with open(f, "w") as log:
+        sys.stderr = log
+        try:
+            yield
+        except Exception:
+            import traceback
+            log.write(traceback.format_exc())
+            sys.exit(1)
 
 
 with file_logging(snakemake.log[0]):
