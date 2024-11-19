@@ -32,7 +32,7 @@ def fasta_writer(filename):
 
 
 def convert_taxdb_utax(input, output):
-    reserved_chars = re.compile("[ ,:]")
+    reserved_chars = re.compile("[,:]")
     rank_pat = re.compile(r"\s*?([a-z]+)__(.*?)\s*")
     with fasta_reader(input) as records, fasta_writer(output) as out:
         for rec in records:
