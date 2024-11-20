@@ -14,7 +14,7 @@ if [[ "${snakemake_params[program]}" == "vsearch" ]]; then
 else
     # USEARCH doesn't like empty input files
     if [ ! -s "${snakemake_input[fa]}" ]; then
-        echo "$taxtab_header" | gzip -c > "${snakemake_output[taxtab]}"
+        echo -e "$taxtab_header" | gzip -c > "${snakemake_output[taxtab]}"
         echo -n | gzip -c > "${snakemake_output[sintax]}"
         exit 0
     fi
@@ -23,7 +23,7 @@ fi
 # random seed: not compatible with multithreading
 if [[ ${snakemake_params[rand_seed]} > 0 ]]; then
    extra="$extra -randseed ${snakemake_params[rand_seed]}"
-   ${snakemake[threads]}=1
+   snakemake[threads]=1
 fi
 
 sintax_out="${snakemake_output[sintax]%.*}"
@@ -39,7 +39,7 @@ sintax_out="${snakemake_output[sintax]%.*}"
     1>&2
 
 # convert to Qiime-like tabular format
-echo "$taxtab_header" | gzip -c > "${snakemake_output[taxtab]}"
+echo -e "$taxtab_header" | gzip -c > "${snakemake_output[taxtab]}"
 # TODO: confidence not extracted
 awk -v IFS="\t" -v OFS="\t" '{print $1, $4, ""}' "$sintax_out" |
     sed -E 's/([a-z]):([^,\t]+),/\1__\2;/g' | # convert lineages to QIIME format
