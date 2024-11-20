@@ -57,6 +57,10 @@ for comb in ${snakemake_params[primer_comb]}; do
         echo -n | zstd -cq >"$outdir/$comb.fastq.zst"
     fi
 done
+
+# compress remaining files from non-specified primer combinations
+zstd --rm -qf "$outdir"/*.fastq
+
 # compress reads that are too short
 if [ -e "$short_file" ]; then
     zstd -qf --rm "$short_file"
