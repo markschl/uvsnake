@@ -20,10 +20,10 @@ done
 
 ## Download taxonomy database
 
-For taxonomic assignments (`sintax` command, see next chapter), we download all Eukaryota ITS reference sequences the UNITE database. Here, we use the more strictly filtered dataset (doesn't contain all singletons) (https://doi.org/10.15156/BIO/2938081):
+For taxonomic assignments (`sintax` command, see next chapter), we download the fungal ITS reference sequences from UNITE. Here, we use the more strictly filtered dataset (doesn't contain all singletons) (https://doi.org/10.15156/BIO/2959336):
 
 ```sh
-url=https://files.plutof.ut.ee/public/orig/1C/C2/1CC2477429B3A703CC1C7A896A7EFF457BB0D471877CB8D18074959DBB630D10.tgz
+url=https://s3.hpc.ut.ee/plutof-public/original/db1d6ddb-a35d-48c5-8b1a-ad9dd3310c6d.tgz
 wget --no-check-certificate -O unite.tar.gz $url
 mkdir -p unite
 tar -C unite -xzf unite.tar.gz
@@ -44,12 +44,12 @@ cat $taxonomy |
   sed -E 's/;sh__.*//g' `# remove 'sh' rank` \
   > unite/tax.txt
 
-# Subsequently, we use https://github.com/markschl/seqtool v0.3 to add the taxonomy to the
+# Subsequently, we use https://github.com/markschl/seqtool v0.4-beta to add the taxonomy to the
 # FASTA headers.
 # Also, in this case we remove (potentially) poorly annotated sequences,
 # which have no known order name
 # In this example, 178141 of 234479 sequences are retained
-st set -d '{l:2}' -ul unite/tax.txt $fasta |
+st set -m unite/tax.txt -d '{meta(2)}' $fasta |
   st find --exclude --desc --regex ';o__;f__;g__;s__$' |
   gzip -c > mock_example/unite_refs.fasta.gz
 

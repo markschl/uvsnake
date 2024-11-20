@@ -1,14 +1,15 @@
-defaults:
-  program: vsearch
-  # optional (these are the defaults)
-  maxaccepts: 1
-  maxrejects: 1
+# Simple configuration template
+# see https://github.com/markschl/uvsnake/blob/main/config/README.md
+# for more information
+
+# (optional: change program globally)
+# program: vsearch
 
 primers:
   forward:
-    - fwd_name: SEQUENCE
+    - fwd_primer: SEQUENCE1, SEQUENCE2
   reverse:
-    - rev_name: SEQUENCE
+    - rev_primer: SEQUENCE
   trim_settings:
     min_overlap: 15
     max_error_rate: 0.1
@@ -16,6 +17,7 @@ primers:
 
 merge:
   overlap_ident: 75
+  # hiere, we chose max_diffs high enough to rely on overlap identity only
   max_diffs: 1000
 
 filter:
@@ -27,14 +29,13 @@ uparse:
 
 # (optional, only needed if 'unoise3' rule is run)
 unoise3:
+  # lower to 4 for higher sensitivity, consider raising for very large datasets
   min_size: 8
 
 otutab:
   ident_threshold: 97
-  # higher values -> slower, but more precise OTU table
-  maxaccepts: 8
-  maxrejects: 8
 
+# (optional, if 'sintax' rule is run)
 sintax:
   db: refdb.fasta.gz
   db_format: qiime
