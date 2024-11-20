@@ -52,7 +52,7 @@ def convert_taxdb_utax(input, output):
                     "Not a valid QIIME-formatted lineage: {}".format(lineage))
             # remove empty ranks, since the UTAX format does not require every rank
             # in every lineage
-            lineage_out = [(rank, name)
+            lineage_out = [(rank[0], name)
                            for rank, name in lineage if name.strip() != ""]
             # final format
             rec.id = "{id};tax={tax};".format(
