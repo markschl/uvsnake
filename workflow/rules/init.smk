@@ -71,7 +71,7 @@ def init_sintax_config(config):
         try:
             _cfg = cfg[comb]
         except KeyError:
-            _cfg = {}
+            _cfg = cfg[comb] = {}
         # fill in missing keys from global sintax config
         for k in required_keys + optional_keys:
             if not k in _cfg:
@@ -102,7 +102,6 @@ def init_sintax_config(config):
         hash2db[hash_value] = (abs_path, fmt)
 
 
-
 # Initialize primers, taxonomy and input samples if corresponding sections 
 # present in configuration
 # (otherwise we assume that uvsnake is used as Snakemake module and not all
@@ -122,11 +121,9 @@ if "sample_file" in config and exists(config["sample_file"]):
     ), "Duplicate sample names found"
     config["_layout"] = l.layout
 
-# from pprint import pprint; pprint(config)
 # fill in the correct USEARCH/VSEARCH binary for each section
 for section in ["merge", "unoise3", "uparse", "otutab", "sintax"]:
     if section in config:
-        print(section, config[section])
         program = config[section].get("program", None)
         if program is None:
             program = config["program"]
@@ -138,3 +135,4 @@ for section in ["merge", "unoise3", "uparse", "otutab", "sintax"]:
         config[section]["program"] = program
 
 
+from pprint import pprint; pprint(config)
